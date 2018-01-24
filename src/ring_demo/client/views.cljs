@@ -46,7 +46,7 @@
                 Heading
                 Image
                 Entity]} response]
-    [:div.summary
+    [:div.summary-panel
      [:div.header
       [:div.heading  Heading]
       (when (non-blank? Image)
