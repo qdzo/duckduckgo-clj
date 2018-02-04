@@ -28,9 +28,9 @@
   (GET "/search" [q] (if q
                        (json/generate-string (ask q))
                        (warning-msg "Query can't be an empty string.")))
+  (GET "/ping" [] "pong")
   (route/resources "/assets/")
   (route/not-found "<p>Page not found</p>"))
-
 
 (def app
   "main app handler"
@@ -52,6 +52,7 @@
   (def maybe-stop (run-server))
 
   )
+
 
 ;; calls on namespace loading (tested in repl)
 

@@ -37,6 +37,9 @@
   ;; search
   (do-get "search" {:query-params {:q "Clojure"}})
 
+  ;; get hello through path-param
+  (do-get "ping")
+
   ;; get not-found
   (try
     (do-get "hh")
