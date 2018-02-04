@@ -9,23 +9,46 @@
 ;; Infobox.meta [{label, data_type(string, instance), value}]
 (defn infobox
   "View for `Infobox.content` and `Infobox.meta` data"
-  [content-or-meta]
-  [:ul.infobox-panel
-   (for [i content-or-meta]
-     ^{:key i}
-     [:li [:div (:label i)]
-          [:div (:value i)]])])
+  [{:keys [title content toggled-items on-toggle-sort on-toggle-item]}]
+  [:div.infobox-panel
+   [:strong title]
+   [:button {:on-click on-toggle-sort} "sort"]
+   [:div.infobox-content
+    [:table
+     [:tbody
+      (for [{:keys [label value]} content]
+        ^{:key label}
+        [:tr {:on-click #(on-toggle-item label)
+              :class (when (and toggled-items
+                                (toggled-items label))
+                       "toggled")}
+         [:td label]
+         [:td value]])]]]])
 
+(comment
+  sort-toggled (fn [xs toggled]
+                 (sort (comp not nil? toggled :label) xs))
+  (let [toggled #{"one" "two"}
+        data [{:label "one"}
+              {:label "three"}
+              {:label "two"}]]
+    (sort (comp not nil? toggled :label) data))
+
+  )
 
 ;; Results.[{Icon{Height,Width,URL}, FirstURL, Text}]
 ;; RelatedTopics[{Text,Icon,FirstURL}]
 (defn topics
   "View for `Results` and `RelatedTopics` data"
-  [topics]
-  [:ul.topics-panel
-   (for [item topics]
-     ^{:key item}
-     [:li (:Text item) " - " (:FirstURL item)])])
+  [{:keys [title topics]}]
+  [:div.topics-panel
+   [:strong title]
+   [:div.topics-content
+    [:ul
+     (for [item topics]
+       ^{:key item}
+       [:li [:a {:href (:FirstURL item)}
+             (:Text item)]])]]])
 
 
 ;; Entity (string) (what kind of searched entity)
