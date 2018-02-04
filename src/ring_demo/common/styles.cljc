@@ -19,27 +19,27 @@
     :height "100%"
     :width "100%"
     :margin 0
-    :padding 0}
+    :padding 0
+    :font-size (u/vmin 2.8)}
    [:#app
     {:width "100%"
      :height "100%"
      :display :flex
      :flex-direction :column
-     :justify-content :center
-     }]
+     :justify-content :center}]
    [:a {:color default-color}
     [:&:visited {:color "green"}] ;; TODO change colors
     [:&:hover {:color default-btn-hover-color}]]
    [:ul {:padding-left (u/px 22)}
     [:li {:padding-bottom (u/px 5)}]]
    [:button
-    {:font-size (u/px 15)
+    {:font-size (u/vmin 1)
      :padding-bottom (u/px 1)
      :color "white"
      :background-color default-btn-color
      :border (str "1px  solid " default-border-color)
      :border-radius default-border-radius
-     :transition "300ms"}
+     :transition "200ms"}
     [:&:focus {:outline (u/px 2)}]
     [:&:hover {:cursor :pointer
                :background-color default-btn-hover-color}]
@@ -60,7 +60,7 @@
     {:margin-right (u/px 10)
      :height (u/px 34)
      :width (u/px 270)
-     :font-size (u/px 17)
+     :font-size (u/vmin 2.8)
      :background :transparent
      :border-top 0
      :border-left 0
@@ -77,7 +77,7 @@
    [:#btn
     {:width (u/px 70)
      :height (u/px 35)
-     :font-size (u/px 15)
+     :font-size (u/vmin 2.3)
      :transition "300ms"}
     [:&:focus {}]
     [:&:hover {}]]])
@@ -92,8 +92,8 @@
     :padding (u/px 7)
     :overflow-y "hidden"
     :position "relative"
-    :width "20%"
-    :height "40%"}
+    :width "50%"
+    :height "30%"}
    [:button
     {:position "absolute"
      :top (u/px 7)
@@ -186,8 +186,9 @@
   [:.result
    {:margin-top (u/px 10)
     :overflow-y "auto"
-    :min-height (u/px 200)
+    ;; :min-height (u/px 200)
     :flex-grow 1
+    ;; :flex-direction "column"
     :display "flex"}
    summary-panel-style
    topics-panel-style
