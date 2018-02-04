@@ -4,7 +4,7 @@
 
 (defn index []
   (html
-   [:div#app
+   [:div#root
     [:style style]]
    [:script {:src "assets/js/compiled/out/goog/base.js"}]
    [:script {:src "assets/js/compiled/app.js"}]))
