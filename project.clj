@@ -19,18 +19,16 @@
                  [reagent "0.7.0"]
                  [org.clojure/core.async "0.4.474"]
                  [cljs-http "0.1.44"]]
-  
-
   ;; java-9 support
   ;; :jvm-opts ["--add-modules" "java.xml.bind"]
 
   ;; download libs from repl without restart
-  :profiles {:dev {:dependencies [[com.cemerick/pomegranate "1.0.0"] 
+  :profiles {:dev {:dependencies [[com.cemerick/pomegranate "1.0.0"]
                                   [org.clojure/test.check "0.9.0"]
                                   [binaryage/devtools "0.9.4"]
                                   [figwheel-sidecar "0.5.14"]
                                   [com.cemerick/piggieback "0.2.2"]]
-                   ;; to load user.clj for dev 
+                   ;; to load user.clj for dev
                    :source-paths ["src" "dev"]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :clean-targets ^{:protect false} ["resources/public/js/compiled"
@@ -45,21 +43,22 @@
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]]
 
   ;; for 'lein ring server' command and code hot-reload
-  :ring {:handler ring-demo.core/app}
+  :ring {:handler ring-demo.server.core/app}
 
   :cljsbuild {:builds [{:id "dev"
-                         :source-paths ["src"]
-                         ;; inject figwheel client into build
-                         :figwheel {:on-jsload "ring-demo.client.core/on-js-reload"}
-                         :compiler {; :main ui.core
-                                    :optimizations :none
-                                    :asset-path "js/compiled/out"
-                                    :output-to "resources/public/js/compiled/app.js"
-                                    :output-dir "resources/public/js/compiled/out/"
-                                    :pretty-print true
-                                    :source-map-timestamp true
-                                    ;; get this part from 'lein figwheel' template
-                                    :preloads [devtools.preload]}}
+                        :source-paths ["src"]
+                        ;; inject figwheel client into build
+                        :figwheel {:on-jsload "ring-demo.client.core/on-js-reload"}
+                        :compiler {
+                                   ;; without :main devtools preloads doesn't work
+                                   :main ring-demo.client.core
+                                   :optimizations :none
+                                   :asset-path "js/compiled/out"
+                                   :output-to "resources/public/js/compiled/app.js"
+                                   :output-dir "resources/public/js/compiled/out/"
+                                   :pretty-print true
+                                   :source-map-timestamp true
+                                   :preloads [devtools.preload]}}
                        {:id "min"
                         :source-paths ["src"]
                         :compiler {:output-to "resources/public/js/compiled/app.js"
@@ -71,5 +70,4 @@
   :figwheel {:open-file-command "emacsclient"
              ;; :css-dirs ["resources/public/css"] ;; <- not needed currently
              }
-
   )
