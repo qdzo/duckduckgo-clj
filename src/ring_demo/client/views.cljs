@@ -62,25 +62,31 @@
 (defn result-summary
   "Aggregate view of all small results (see above)"
   [response]
-  (let [{:keys [Abstract
-                AbstractText
-                AbstractSource
-                AbstractURL
-                Heading
-                Image
-                Entity]} response]
+  (let [{:keys
+         [;; Abstract ;; REVIEW: why i don't use this key: Abstract
+          AbstractText
+          AbstractSource
+          AbstractURL
+          Heading
+          Image
+          Entity]} response]
     [:div.summary-panel
      [:div.header
       [:div.heading  Heading]
       (when (non-blank? Image)
-        [:div.logo  [:img {:src Image
-                           :alt Heading
-                           }]])]
+        [:div.logo
+         [:img
+          {:src Image
+           :alt Heading}]])]
+     [:div.content
       (when (non-blank? Entity)
-        [:div.entity "type: " Entity])
+        [:div.entity
+         [:div.prop-name  "type: "]
+         Entity])
       (when (non-blank? AbstractText)
-        [:div.definition "Definition: " AbstractText])
+        [:div.definition
+         [:div.prop-name "Definition: "]
+         AbstractText])
       (when (non-blank? AbstractSource)
-        [:div.info "info: " [:a {:href AbstractURL} AbstractSource]])]))
-
+        [:div.info "info:" [:a {:href AbstractURL} AbstractSource]])]]))
 
