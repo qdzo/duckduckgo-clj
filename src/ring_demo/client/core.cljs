@@ -16,9 +16,7 @@
 (defonce state
   (atom {:input ""
          :online true
-         :last-online nil
-         :toggled {:content #{} :meta-content #{}}
-         :sort #{}}))
+         :last-online nil}))
 
 ;; TODO: don't forget to remove this watch
 ;; (add-watch
@@ -83,9 +81,7 @@
            (assoc :online is-online)
            (assoc :last-online nil)))))
 
-;; (go (println (<! (ping-server))))
 
-;; (apply-ping @state false)
 (def log js/console.log)
 
 (defonce -ping-machine
@@ -93,48 +89,15 @@
         (<! (timeout 5000))
         (dispatch :ping (<! (ping-server))))))
 
-(defn toggle-in-set
-  "Generic togging function.
-   Adds or removes to-toggle item to(from) set"
-  [toggled to-toggle]
-  (if (toggled to-toggle)
-    (disj toggled to-toggle)
-    (conj toggled to-toggle)))
-
-(defn sort-toggled-content
-  "Sorts `coll`. Firts toggled goes."
-  [coll toggled]
-  (sort (comp not nil? toggled :label) coll))
-
-(defn set-response-and-reset-toggles
-  [state response]
-  (-> state
-      (assoc :response response)
-      (assoc-in [:toggled :content] #{})
-      (assoc-in [:toggled :meta-content] #{})
-      (assoc :sort #{})))
-
-(set-response-and-reset-toggles @state "")
-
-@state
-
-;; (reset! state {})
-
-
-                                        ;(toggle-content #{:some :two} :two)
-;; (-> @state (dissoc :response))
 
 (def actions
   {:ask ask-duckduckgo
    :change-input #(swap! state assoc :input %)
    :log #(js/console.log %)
    :reset #(reset! state {})
-   :toggle-content #(swap! state update-in
-                           [:toggled (first %)] toggle-in-set (second %))
    ;; :toggle-content #(js/console.log %1 %2)
-   :toggle-sort-content #(swap! state update :sort toggle-in-set %)
    :ping #(swap! state apply-ping %)
-   :set-response #(swap! state set-response-and-reset-toggles %)})
+   :set-response #(swap! state assoc :response %)})
 
 (comment
 
@@ -148,24 +111,6 @@
       (let [[action payload] (<! $events-chan)
             f (get actions action)]
         (f payload)))))
-
-#_(go (while true
-      (let [response (<! (http/get (:ping api)))
-            t (<! (timeout 5000))
-            is-online (= (:status response) 200)
-            prev (:online @state)]
-        (when (and  (not is-online)
-                    (not= is-online prev))
-          (swap! state assoc :last-online
-                 (let [time (js/Date.)
-                       seconds (.getSeconds time)
-                       minus-5-seconds (js/Date. (.setSeconds time (- seconds 5)))]
-                   (.toLocaleString minus-5-seconds)))
-          (when (not= is-online prev)
-            (swap! state assoc :online is-online))))))
-
-;; -req-chan
-
 
 (defn input-panel [input]
   [:div#panel
@@ -184,15 +129,11 @@
      {:on-click #(dispatch :ask input)} "Найти!"]]])
 
 (defn result-panel
-  [response state]
+  [response]
   (let [infobox-meta (get-in response [:Infobox :meta])
         infobox-content (get-in response [:Infobox :content])
         related-topics (response :RelatedTopics)
-        results-topics (response :Results)
-        toggled-content (get-in state [:toggled :content])
-        toggled-meta-content (get-in state [:toggled :meta-content])
-        sort-content? (-> state :sort :content)
-        sort-meta-content? (-> state :sort :meta-content)]
+        results-topics (response :Results)]
     [:div.result
      [v/result-summary response]
      [v/topics
@@ -203,20 +144,10 @@
        :topics related-topics}]
      [v/infobox
       {:title "CONTENT"
-       :content (if sort-content?
-                  (sort-toggled-content infobox-content toggled-content)
-                  infobox-content)
-       :toggled-items toggled-content
-       :on-toggle-sort #(dispatch :toggle-sort-content :content)
-       :on-toggle-item #(dispatch :toggle-content [:content %])}]
+       :content infobox-content}]
      [v/infobox
       {:title    "META-CONTENT"
-       :content  (if sort-meta-content?
-                   (sort-toggled-content infobox-meta toggled-meta-content)
-                   infobox-meta)
-       :toggled-items  toggled-meta-content
-       :on-toggle-sort #(dispatch :toggle-sort-content :meta-content)
-       :on-toggle-item #(dispatch :toggle-content [:meta-content %])}]
+       :content  infobox-meta}]
      #_[:div {:background-color "red"
               :color "yellow"
               :height (u/px 10)
@@ -244,7 +175,7 @@
      [online-indicator online]
      [input-panel input]
      (when response
-       [result-panel response s])]))                    ;; TODO: move state to let
+       [result-panel response])]))                    ;; TODO: move state to let
 
 (comment
   (-> @state  )

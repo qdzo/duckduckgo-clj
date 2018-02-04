@@ -137,13 +137,7 @@
    [:tr :td :th
     {:border "0px solid white"
      :border-bottom (str "1px solid" default-border-color)
-     :padding (u/px 5)}
-    [:&:hover {;;:background-color default-btn-hover-color
-               :border-bottom (str "2px solid" default-border-color)
-               :cursor "pointer"}]
-    [:&.toggled {:background-color
-                 default-btn-hover-color}]
-    ]])
+     :padding (u/px 5)}]])
 
 (def topics-panel-style
   [:div.topics-panel

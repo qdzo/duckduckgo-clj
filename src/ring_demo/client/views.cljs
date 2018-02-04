@@ -1,5 +1,6 @@
 (ns ring-demo.client.views
-  (:require [clojure.string :refer [blank?]]))
+  (:require [clojure.string :refer [blank?]]
+            [reagent.core :refer [atom]]))
 
 (def non-blank?
   "predicate for non-blank string"
@@ -9,19 +10,15 @@
 ;; Infobox.meta [{label, data_type(string, instance), value}]
 (defn infobox
   "View for `Infobox.content` and `Infobox.meta` data"
-  [{:keys [title content toggled-items on-toggle-sort on-toggle-item]}]
+  [{:keys [title content]}]
   [:div.infobox-panel
    [:strong title]
-   [:button {:on-click on-toggle-sort} "sort"]
    [:div.infobox-content
     [:table
      [:tbody
       (for [{:keys [label value]} content]
         ^{:key label}
-        [:tr {:on-click #(on-toggle-item label)
-              :class (when (and toggled-items
-                                (toggled-items label))
-                       "toggled")}
+        [:tr
          [:td label]
          [:td value]])]]]])
 
