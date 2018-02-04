@@ -28,7 +28,6 @@
   (GET "/search" [q] (if q
                        (json/generate-string (ask q))
                        (warning-msg "Query can't be an empty string.")))
-  (GET "/ping" [] "pong")
   (route/resources "/assets/")
   (route/not-found "<p>Page not found</p>"))
 
@@ -38,14 +37,12 @@
    #'app-routes
    site-defaults))
 
+#_(wrap-reload #'app) ;; try to live without this
+
 ;; jetty-run should return fn that stops server
 (defn run-server []
   (future
-    (jetty/run-jetty
-     ;; (cors-wrap #'app-routes)
-     #'app
-     #_(wrap-reload #'app) ;; try to live without this
-     {:port 3000})))
+    (jetty/run-jetty #'app {:port 3000})))
 
 (comment
 

@@ -10,8 +10,7 @@
 (def api
   (let [url "http://localhost:3000/"]
     {:ask (str url "search")
-     :dummy-ask (str url "assets/dummy.edn")
-     :ping (str url "ping")}))
+     :dummy-ask (str url "assets/dummy.edn")}))
 
 (defonce state
   (atom {:input ""
@@ -61,33 +60,7 @@
               (js->clj :keywordize-keys true))]
       (dispatch :set-response response))))
 
-
-(defn ping-server []
-  (go (-> api :ping http/get <! :status (= 200))))
-
-(defn apply-ping
-  [{:keys [online] :as state} is-online]
-  (if (= is-online online)
-    state
-    (if (= is-online false)
-      (-> state
-          (assoc :online is-online)
-          (assoc :last-online
-                 (let [time (js/Date.)
-                       seconds (.getSeconds time)
-                       minus-5-seconds (js/Date. (.setSeconds time (- seconds 5)))]
-                   (.toLocaleString minus-5-seconds))))
-      (->  state
-           (assoc :online is-online)
-           (assoc :last-online nil)))))
-
-
 (def log js/console.log)
-
-(defonce -ping-machine
-  (go (while true
-        (<! (timeout 5000))
-        (dispatch :ping (<! (ping-server))))))
 
 
 (def actions
@@ -96,7 +69,6 @@
    :log #(js/console.log %)
    :reset #(reset! state {})
    ;; :toggle-content #(js/console.log %1 %2)
-   :ping #(swap! state apply-ping %)
    :set-response #(swap! state assoc :response %)})
 
 (comment
