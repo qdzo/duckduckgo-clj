@@ -13,9 +13,7 @@
      :dummy-ask (str url "assets/dummy.edn")}))
 
 (defonce state
-  (atom {:input ""
-         :online true
-         :last-online nil}))
+  (atom {:input ""}))
 
 ;; TODO: don't forget to remove this watch
 ;; (add-watch
@@ -129,22 +127,11 @@
               :on-click #(dispatch :reset "")
               } "XXX"]]))
 
-(defn online-indicator
-  [is-online]
-  [:div.online-indicator
-   {:class (if is-online
-             :online
-             :offline)}
-   (if is-online
-     "on-line"
-     "off-line")])
-
 (defn app []
-  (let [{:keys [online input response] :as s} @state]
+  (let [{:keys [input response] :as s} @state]
     (log "APP RENDER")
     [:div#app
      [:style style]
-     [online-indicator online]
      [input-panel input]
      (when response
        [result-panel response])]))                    ;; TODO: move state to let

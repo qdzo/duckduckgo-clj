@@ -46,7 +46,7 @@
 
 (comment
 
-  (def maybe-stop (run-server))
+  (def server (run-server))
 
   )
 

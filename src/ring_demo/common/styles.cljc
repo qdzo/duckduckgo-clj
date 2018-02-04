@@ -45,25 +45,6 @@
                :background-color default-btn-hover-color}]
     [:&:active {:background-color "RED"}]]]) ;; TODO change color
 
-(def online-indicator
-  [:.online-indicator
-   {:height (u/px 13)
-    :min-width (u/px 48)
-    :padding-left (u/px 7)
-    :padding-right (u/px 7)
-    :padding-top (u/px 3)
-    :padding-bottom (u/px 2)
-    :font-family "Consolas"
-    :font-size (u/px 12)
-    :position "absolute"
-    :right (u/px 10)
-    :top (u/px 10)
-    :border-radius default-border-radius
-    :border (str "1px solid" default-border-color)
-    }
-   [:&.online {:background-color "green"}]
-   [:&.offline {:background-color "red"}]])
-
 (def input-panel-style
   [:#panel
    {:text-align "center"
@@ -218,6 +199,5 @@
 
 (def style
   (css body-style
-       online-indicator
        input-panel-style
        result-panel-style))
