@@ -84,10 +84,10 @@
 
 (defn input-panel [input]
   [:div#panel
-   [:div [:h1 "Твой личный поисковик."]
+   [:div [:h1 "DuckDuckGo Asker"]
     [:input
      {:type "text"
-      :placeholder "Введи запрос..."
+      :placeholder "Enter query..."
       :value input
       :on-change
       #(dispatch :change-input
@@ -96,7 +96,7 @@
       #(when (= (.. % -keyCode) 13) ;; 13=ENTER key
          (dispatch :ask input))}]
     [:button#btn
-     {:on-click #(dispatch :ask input)} "Найти!"]]])
+     {:on-click #(dispatch :ask input)} "Ask"]]])
 
 (defn result-panel
   [response]

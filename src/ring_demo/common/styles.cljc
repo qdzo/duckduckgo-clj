@@ -2,7 +2,6 @@
   (:require [garden.core :refer [css]]
             [garden.units :as u]))
 
-
 (def default-background-color "#352727")
 (def default-color "white")
 (def default-border-color "#6868f1")
@@ -20,7 +19,7 @@
     :width "100%"
     :margin 0
     :padding 0
-    :font-size (u/vmin 2.8)}
+    :font-size (u/vmin 2.5)}
    [:#app
     {:width "100%"
      :height "100%"
@@ -33,7 +32,7 @@
    [:ul {:padding-left (u/px 22)}
     [:li {:padding-bottom (u/px 5)}]]
    [:button
-    {:font-size (u/vmin 1)
+    {:font-size (u/vmin 0.7)
      :padding-bottom (u/px 1)
      :color "white"
      :background-color default-btn-color
@@ -60,7 +59,7 @@
     {:margin-right (u/px 10)
      :height (u/px 34)
      :width (u/px 270)
-     :font-size (u/vmin 2.8)
+     :font-size (u/vmin 2.5)
      :background :transparent
      :border-top 0
      :border-left 0
@@ -77,7 +76,7 @@
    [:#btn
     {:width (u/px 70)
      :height (u/px 35)
-     :font-size (u/vmin 2.3)
+     :font-size (u/vmin 2.2)
      :transition "300ms"}
     [:&:focus {}]
     [:&:hover {}]]])
@@ -87,31 +86,30 @@
    {:color default-color
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
-    :margin (u/px 5)
-    :margin-left 0
+    :margin (u/px 7)
+    ;; :margin-top (u/px 5)
+    :margin-bottom (u/px 0)
     :padding (u/px 7)
-    :overflow-y "hidden"
-    :position "relative"
-    :width "50%"
-    :height "30%"}
-   [:button
-    {:position "absolute"
-     :top (u/px 7)
-     :right (u/px 7)}]
+    ;; :overflow-y "hidden"
+    ;; :position "relative"
+    ;; :width "50%"
+    ;; :height "30%"
+    }
    [:div.infobox-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
      :padding-right (u/px 5)
      :margin-top (u/px 2)
      :margin-bottom (u/px 5 )
-     :height "85%"
-     :width "90%"
+     ;; :height "85%"
+     ;; :width "90%"
      ;; :min-width "400px"
-     :position "absolute"
+     ;; :position "absolute"
      :overflow-y "auto"}]
    [:table {:border-collapse "collapse"
             :margin-top (u/px 5)
             ;; FIXME: remove this 3 lines
+            :width "100%"
             :border "none"
             :cellspacing 0
             :cellpadding 0}]
@@ -125,21 +123,15 @@
    {:color default-color
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
-    :margin (u/px 5)
-    :margin-left 0
-    :overflow-y "hidden"
-    :width "20%"
-    :height "40%"
-    :position "relative"
+    :margin (u/px 7)
+    :margin-bottom (u/px 0)
+    ;; :position "relative"
     :padding (u/px 7)}
    [:div.topics-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
      :margin-top (u/px 2)
      :margin-bottom (u/px 5 )
-     :height "89%"
-     :width "89%"
-     :position "absolute"
      :overflow-y "auto"}]])
 
 (def summary-panel-style
@@ -147,11 +139,8 @@
    {;; :width "40%"
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
-    :margin (u/px 5)
-    :overflow-y "hidden"
-    :width "20%"
-    :height "40%"
-    :position "relative"
+    :margin (u/px 7)
+    :margin-bottom (u/px 0)
     :padding (u/px 7)}
    [:.header
     {:display "flex"
@@ -171,10 +160,7 @@
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
      :margin-top (u/px 2)
-     :margin-bottom (u/px 5 )
-     :height "62%"
-     :position "absolute"
-     :overflow-y "auto"}]
+     :margin-bottom (u/px 5)}]
    [:.entity {:margin-bottom (u/px 10)}]
    [:.definition {:margin-bottom (u/px 10)}]
    [:.info
@@ -188,7 +174,7 @@
     :overflow-y "auto"
     ;; :min-height (u/px 200)
     :flex-grow 1
-    ;; :flex-direction "column"
+    :flex-direction "column"
     :display "flex"}
    summary-panel-style
    topics-panel-style
