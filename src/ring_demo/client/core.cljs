@@ -12,6 +12,30 @@
     {:ask (str url "search")
      :dummy-ask (str url "assets/dummy.edn")}))
 
+;; app undo-redo history
+(defonce history
+  (atom {:index -1
+         :history []}))
+
+(defn add-to-history! [state]
+  (let [{hist :history index :index}  @history]
+    (if (< (inc index) (count hist))
+      (swap! history
+             #(-> %
+                  (update :history
+                          (fn [h] (conj (subvec h 0 (inc index))
+                                       state)))
+                  (update :index inc)))
+      (swap! history
+             #(-> %
+                  (update :history conj state)
+                  (update :index inc))))))
+
+(defn prev-history-state! []
+  (when (> (inc (:index @history)) 0)
+    (swap! history update :index dec)
+    (nth (:history @history) (:index @history))))
+
 (defonce state
   (atom {:input ""}))
 
@@ -82,9 +106,9 @@
             f (get actions action)]
         (f payload)))))
 
-(defn input-panel [input]
-  [:div#panel
-   [:div [:h1 "DuckDuckGo Asker"]
+(defn input-panel [input minimized]
+  [:div#panel (if minimized {:class "minimized"})
+   [:div [:h1 "DuckDuckGo Instant Answers"]
     [:input
      {:type "text"
       :placeholder "Enter query..."
@@ -96,7 +120,7 @@
       #(when (= (.. % -keyCode) 13) ;; 13=ENTER key
          (dispatch :ask input))}]
     [:button#btn
-     {:on-click #(dispatch :ask input)} "Ask"]]])
+     {:on-click #(dispatch :ask input)} "Ask me!"]]])
 
 (defn result-panel
   [response]
@@ -132,14 +156,17 @@
     (log "APP RENDER")
     [:div#app
      [:style style]
-     [input-panel input]
+     [input-panel input response]
      (when response
        [result-panel response])]))                    ;; TODO: move state to let
 
 (comment
-  (-> @state  )
+  ((-> @state  :response))
 
-  (v/result-summary (:result @state)))
+  (v/result-summary (:response @state))
+  (input-panel (:input @state) nil)
+
+  )
 
 (reagent/render [app]
   (js/document.querySelector "#root"))

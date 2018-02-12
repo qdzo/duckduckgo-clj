@@ -38,7 +38,7 @@
 
   :plugins [[lein-ring "0.12.1"] ;; code live-reload, uberjar,
             [cider/cider-nrepl "0.15.1"]
-            [refactor-nrepl "2.3.1"]
+            ;; [refactor-nrepl "2.3.1"] ;; overrides clojure.core/boolean?
             [lein-figwheel "0.5.14"]
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]]
 
