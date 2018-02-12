@@ -19,7 +19,8 @@
     :width "100%"
     :margin 0
     :padding 0
-    :font-size (u/vmin 2.5)}
+    :font-size (u/vmin 2.3)
+    }
    [:#app
     {:width "100%"
      :height "100%"
@@ -48,18 +49,22 @@
   [:#panel
    {:text-align "center"
     :display :flex
+    ;; :margin-bottom (u/px 20)
+    :flex-grow 1
     :flex-direction :column
     :justify-content :center
-    :transition "2s"
+    :transition "1s"
     :align-items :center}
-   [:.minimized {:flex-grow 1}]
-   [:h1 {:margin-top (u/px 7)}]
+   [:&.minimized {:display "block"}]
+   [:h1 {:margin-top (u/px 7)
+         :font-size (u/vmin 3.0)
+         :font-weight "lighter"}]
    ["input::-webkit-input-placeholder" {:color "white"}]
    [:input
     {:margin-right (u/px 10)
      :height (u/px 34)
      :width (u/px 270)
-     :font-size (u/vmin 2.5)
+     :font-size (u/vmin 2.0)
      :background :transparent
      :border-top 0
      :border-left 0
@@ -76,7 +81,7 @@
    [:#btn
     {:width (u/px 70)
      :height (u/px 35)
-     :font-size (u/vmin 2.2)
+     :font-size (u/vmin 1.5)
      :transition "300ms"}
     [:&:focus {}]
     [:&:hover {}]]])
@@ -98,7 +103,6 @@
    [:div.infobox-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
-     :padding-right (u/px 5)
      :margin-top (u/px 2)
      :margin-bottom (u/px 5 )
      ;; :height "85%"
@@ -112,6 +116,7 @@
             :width "100%"
             :border "none"
             :cellspacing 0
+            :font-size (u/vmin 2.3)
             :cellpadding 0}]
    [:tr :td :th
     {:border "0px solid white"
@@ -170,10 +175,10 @@
 
 (def result-panel-style
   [:.result
-   {:margin-top (u/px 10)
+   {:margin-top (u/px 7)
     :overflow-y "auto"
     ;; :min-height (u/px 200)
-    :flex-grow 1
+    ;; :flex-grow 1
     :flex-direction "column"
     :display "flex"}
    summary-panel-style
