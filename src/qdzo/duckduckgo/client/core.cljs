@@ -17,24 +17,34 @@
   (atom {:index -1
          :history []}))
 
-(defn add-to-history! [state]
-  (let [{hist :history index :index}  @history]
-    (if (< (inc index) (count hist))
-      (swap! history
-             #(-> %
-                  (update :history
-                          (fn [h] (conj (subvec h 0 (inc index))
-                                       state)))
-                  (update :index inc)))
-      (swap! history
-             #(-> %
-                  (update :history conj state)
-                  (update :index inc))))))
+(defn add-to-history [{:keys [history index] :as h} new-item]
+  (let [history-size (count history)
+        next-index (inc index)]
+   (if (< next-index history-size)
+    (assoc h
+      :history (conj (subvec history 0 next-index) new-item)
+      :index next-index)
+    (assoc h
+      :history (conj history new-item)
+      :index next-index))))
 
-(defn prev-history-state! []
-  (when (> (inc (:index @history)) 0)
-    (swap! history update :index dec)
-    (nth (:history @history) (:index @history))))
+(defn add-to-history! [new-item]
+  (swap! history add-to-history new-item))
+
+(defn history-current-item [{:keys [history index]}]
+  (nth history index))
+
+(defn prev-history-item! []
+  (when (> (:index @history) -1)
+    (-> (swap! history update :index dec)
+        history-current-item)))
+
+(defn next-history-item! []
+  (let [history-size (count (:history @history))
+        next-index (inc (:index @history))]
+   (when (< next-index history-size)
+    (-> (swap! history update :index inc)
+        history-current-item))))
 
 (defonce state
   (atom {:input ""}))
@@ -59,12 +69,12 @@
 
   (-> @state  :response :RelatedTopics (nth 1))
 
-  (-> @state  :response )
+  (-> @state  :response)
 
 
-  (swap! state assoc :sort #{})
+  (swap! state assoc :sort #{}))
 
-  )
+
 
 ;; (defonce dummy-data (-> @state  :response ))
 
@@ -95,8 +105,8 @@
 
 (comment
 
-  (-> @state :toggled)
-  )
+  (-> @state :toggled))
+
 ;; (dispatch :ask "Clojurescript")
 
 (defonce -action-chan
@@ -148,8 +158,8 @@
               :width (u/px 10)
               :margin-top "7px"
               :margin-right "7px"
-              :on-click #(dispatch :reset "")
-              } "XXX"]]))
+              :on-click #(dispatch :reset "")}
+             "XXX"]]))
 
 (defn app []
   (let [{:keys [input response] :as s} @state]
@@ -164,9 +174,9 @@
   ((-> @state  :response))
 
   (v/result-summary (:response @state))
-  (input-panel (:input @state) nil)
+  (input-panel (:input @state) nil))
 
-  )
+
 
 (reagent/render [app]
   (js/document.querySelector "#root"))
