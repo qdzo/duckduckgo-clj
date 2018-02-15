@@ -20,13 +20,14 @@
                  [org.clojure/core.async "0.4.474"]
                  [cljs-http "0.1.44"]]
   ;; java-9 support
-  ;; :jvm-opts ["--add-modules" "java.xml.bind"]
+  :jvm-opts ["--add-modules" "java.xml.bind"]
 
   ;; download libs from repl without restart
   :profiles {:dev {:dependencies [[com.cemerick/pomegranate "1.0.0"]
                                   [org.clojure/test.check "0.9.0"]
                                   [binaryage/devtools "0.9.4"]
                                   [figwheel-sidecar "0.5.14"]
+                                  [proto-repl "0.3.1"]
                                   [com.cemerick/piggieback "0.2.2"]]
                    ;; to load user.clj for dev
                    :source-paths ["src" "dev"]
