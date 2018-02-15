@@ -1,6 +1,6 @@
-(ns ring-demo.core-test
+(ns qdzo.duckduckgo.core-test
   (:require [clojure.test :refer :all]
-            [ring-demo.core :refer :all]))
+            [qdzo.duckduckgo.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

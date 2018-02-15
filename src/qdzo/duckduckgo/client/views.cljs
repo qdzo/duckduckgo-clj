@@ -1,4 +1,4 @@
-(ns ring-demo.client.views
+(ns qdzo.duckduckgo.client.views
   (:require [clojure.string :refer [blank?]]
             [reagent.core :refer [atom]]))
 

@@ -1,12 +1,12 @@
-(ns ring-demo.server.core
+(ns qdzo.duckduckgo.server.core
   (:require [ring.adapter.jetty :as jetty]
             ;; [ring.middleware.reload :refer [wrap-reload]] ;; try to live without this
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer :all]
             [clj-json.core :as json]
-            [ring-demo.server.views :refer :all]
-            [ring-demo.server.duckduckgo :refer [ask sanitize-response]]))
+            [qdzo.duckduckgo.server.views :refer :all]
+            [qdzo.duckduckgo.server.duckduckgo :refer [ask sanitize-response]]))
 
 (defn warning-msg
   "make wanding msg as json"

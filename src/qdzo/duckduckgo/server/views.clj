@@ -1,6 +1,6 @@
-(ns ring-demo.server.views
+(ns qdzo.duckduckgo.server.views
   (:require [hiccup.core :refer [html]]
-            [ring-demo.common.styles :refer [style]]))
+            [qdzo.duckduckgo.common.styles :refer [style]]))
 
 (defn index []
   (html

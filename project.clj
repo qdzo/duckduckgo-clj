@@ -1,4 +1,4 @@
-(defproject ring-demo "0.1.0-SNAPSHOT"
+(defproject duckduckgo-clj "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -43,15 +43,15 @@
             [lein-cljsbuild "1.1.7" :exclusions [[org.clojure/clojure]]]]
 
   ;; for 'lein ring server' command and code hot-reload
-  :ring {:handler ring-demo.server.core/app}
+  :ring {:handler qdzo.duckduckgo.server.core/app}
 
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
                         ;; inject figwheel client into build
-                        :figwheel {:on-jsload "ring-demo.client.core/on-js-reload"}
+                        :figwheel {:on-jsload "qdzo.duckduckgo.client.core/on-js-reload"}
                         :compiler {
                                    ;; without :main devtools preloads doesn't work
-                                   :main ring-demo.client.core
+                                   :main qdzo.duckduckgo.client.core
                                    :optimizations :none
                                    :asset-path "js/compiled/out"
                                    :output-to "resources/public/js/compiled/app.js"
@@ -62,12 +62,10 @@
                        {:id "min"
                         :source-paths ["src"]
                         :compiler {:output-to "resources/public/js/compiled/app.js"
-                                   :main ring-demo.client.core
+                                   :main duckduckgo.client.core
                                    :optimizations :advanced
                                    :pretty-print false}}]}
 
 
-  :figwheel {:open-file-command "emacsclient"
+  :figwheel {:open-file-command "emacsclient"})
              ;; :css-dirs ["resources/public/css"] ;; <- not needed currently
-             }
-  )

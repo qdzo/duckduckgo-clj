@@ -1,4 +1,4 @@
-(ns ring-demo.common.styles
+(ns qdzo.duckduckgo.common.styles
   (:require [garden.core :refer [css]]
             [garden.units :as u]))
 

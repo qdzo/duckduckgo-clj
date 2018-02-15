@@ -1,4 +1,4 @@
-(ns ring-demo.server.client
+(ns qdzo.duckduckgo.server.client
   (:require [clj-http.client :as client]))
 
 

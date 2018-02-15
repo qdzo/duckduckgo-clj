@@ -1,9 +1,9 @@
-(ns ring-demo.client.core
+(ns qdzo.duckduckgo.client.core
   (:require [reagent.core :as reagent :refer (atom)]
             [cljs.core.async :refer [<! >! put! chan timeout]]
             [cljs-http.client :as http]
-            [ring-demo.common.styles :refer [style]]
-            [ring-demo.client.views :as v]
+            [qdzo.duckduckgo.common.styles :refer [style]]
+            [qdzo.duckduckgo.client.views :as v]
             [garden.units :as u])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
