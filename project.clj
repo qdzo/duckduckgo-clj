@@ -8,7 +8,7 @@
                  [ring/ring-jetty-adapter "1.6.3"]
                  [ring/ring-codec "1.1.0"] ;; uri-encoders
                  [ring/ring-defaults "0.3.1"] ;; middleware (query params)
-                 ;; [ring/ring-devel "1.6.3"] ;; code hot-reload, i'l try to do as Rizhikov. without such thing. only fn-refenence(#')
+                 ;; [ring/ring-devel "1.6.3"] ;; code hot-reload, i'l try to do without such thing. only fn-refenence(#')
                  [compojure "1.6.0"]
                  [hiccup "1.0.5"]
                  [garden "1.3.3"]
