@@ -3,51 +3,18 @@
             [cljs.core.async :refer [<! >! put! chan timeout]]
             [cljs-http.client :as http]
             [qdzo.duckduckgo.common.styles :refer [style]]
-            [qdzo.duckduckgo.client.views :as v]
-            [garden.units :as u])
+            [qdzo.duckduckgo.client.views :as v])
   (:require-macros [cljs.core.async.macros :refer [go]]))
+
+;; simple logger
+(def log js/console.log)
 
 (def api
   (let [url "http://localhost:3000/"]
     {:ask (str url "search")
      :dummy-ask (str url "assets/dummy.edn")}))
 
-;; app undo-redo history
-(defonce history
-  (atom {:index -1
-         :history []}))
-
-(defn add-to-history [{:keys [history index] :as h} new-item]
-  (let [history-size (count history)
-        next-index (inc index)]
-   (if (< next-index history-size)
-    (assoc h
-      :history (conj (subvec history 0 next-index) new-item)
-      :index next-index)
-    (assoc h
-      :history (conj history new-item)
-      :index next-index))))
-
-(defn add-to-history! [new-item]
-  (swap! history add-to-history new-item))
-
-(defn history-current-item [{:keys [history index]}]
-  (nth history index))
-
-(defn prev-history-item! []
-  (when (> (:index @history) -1)
-    (-> (swap! history update :index dec)
-        history-current-item)))
-
-(defn next-history-item! []
-  (let [history-size (count (:history @history))
-        next-index (inc (:index @history))]
-   (when (< next-index history-size)
-    (-> (swap! history update :index inc)
-        history-current-item))))
-
-(defonce state
-  (atom {:input ""}))
+(defonce state (atom {:input ""}))
 
 ;; TODO: don't forget to remove this watch
 ;; (add-watch
@@ -59,25 +26,41 @@
 ;;          (not= os ns)))))
 
 
+;; chanel for dispatching events
 (defonce $events-chan (chan))
 
 (defn dispatch [action payload]
   (put! $events-chan [action payload]))
 
+(defn subscribe-onpopstate []
+  (log "Subscribe onpopstate")
+  (set! js/window.onpopstate
+        (fn [e]
+          (log "ON_POPSTATE called")
+          (when-let [state (some-> (.-state e) (js->clj :keywordize-keys true))]
+            (dispatch :reset-app-state state)))))
+
+(defn unsubscribe-onpopstate []
+  (log "Unsubscribe onpopstate")
+  (set! js/window.onpopstate nil))
+
+  (defn push-state-to-history [app-state]
+    (log app-state)
+    (js/history.pushState
+      (clj->js app-state) nil (str "/query/" (:input app-state))))
+
 (comment
   (-> @state (dissoc :response))
-
   (-> @state  :response :RelatedTopics (nth 1))
 
   (-> @state  :response)
-
 
   (swap! state assoc :sort #{}))
 
 
 
-;; (defonce dummy-data (-> @state  :response ))
 
+;; (defonce dummy-data (-> @state  :response ))
 ;; dummy-data
 
 
@@ -92,16 +75,21 @@
               (js->clj :keywordize-keys true))]
       (dispatch :set-response response))))
 
-(def log js/console.log)
 
 
 (def actions
   {:ask ask-duckduckgo
    :change-input #(swap! state assoc :input %)
-   :log #(js/console.log %)
-   :reset #(reset! state {})
-   ;; :toggle-content #(js/console.log %1 %2)
-   :set-response #(swap! state assoc :response %)})
+   :reset-app-state #(reset! state %)
+   :set-response #(let [new-state (swap! state assoc :response %)]
+                    (push-state-to-history new-state))})
+
+;; TODO: remove next lines: use browser-history instead
+;; TODO: add undo-redo
+;; (aset js/window "undo"
+;;       (fn [e]
+;;         (when (> (count @history) 1)
+;;           (reset! state (prev-history-item!)))))
 
 (comment
 
@@ -162,35 +150,34 @@
              "XXX"]]))
 
 (defn app []
-  (let [{:keys [input response] :as s} @state]
+  (let [{:keys [input response]} @state]
     (log "APP RENDER")
     [:div#app
      [:style style]
      [input-panel input response]
      (when response
-       [result-panel response])]))                    ;; TODO: move state to let
+       [result-panel response])]))
 
 (comment
-  ((-> @state  :response))
-
+  (-> @state  :response) 
+  @state 
   (v/result-summary (:response @state))
   (input-panel (:input @state) nil))
 
 
+(defn init-app []
+  (unsubscribe-onpopstate)
+  (subscribe-onpopstate)
+  (reagent/render [app]
+                  (js/document.querySelector "#root")))
 
-(reagent/render [app]
-  (js/document.querySelector "#root"))
+(init-app)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; REPL STAFF ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;; (defn index []
-;;   (html
-;;    [:style style]
-;;    [:div#panel
-;;     [:div [:h1 "Твой личный поисковик."]
-;;      [:p "Что ты хочешь найти?"]
-;;      [:input#input {:type "text"
-;;                     :placeholder "Введи запрос..."}]
-;;      [:button#btn  "Найти!"]]
-;;     [:p#result]
-;;     [:div#app]
-;;     ]
+(comment
+         )
+;; called by figwheel
+#_(defn on-js-reload []
+  (log "[----------on-js-reload called---------]")
+  (unsubscribe-onpopstate)
+  (subscribe-onpopstate))
