@@ -1,6 +1,6 @@
 (ns qdzo.duckduckgo.client.views
-  (:require [clojure.string :refer [blank?]]
-            [reagent.core :refer [atom]]))
+  (:require [clojure.string :refer [blank?]]))
+
 
 (def non-blank?
   "predicate for non-blank string"
@@ -18,9 +18,8 @@
      [:tbody
       (for [{:keys [label value]} content]
         ^{:key label}
-        [:tr
-         [:td label]
-         [:td value]])]]]])
+        [:tr [:td label]
+         [:td {} value]])]]]])
 
 (comment
   sort-toggled (fn [xs toggled]
@@ -29,9 +28,9 @@
         data [{:label "one"}
               {:label "three"}
               {:label "two"}]]
-    (sort (comp not nil? toggled :label) data))
+    (sort (comp not nil? toggled :label) data)))
 
-  )
+
 
 ;; Results.[{Icon{Height,Width,URL}, FirstURL, Text}]
 ;; RelatedTopics[{Text,Icon,FirstURL}]
@@ -86,4 +85,3 @@
          AbstractText])
       (when (non-blank? AbstractSource)
         [:div.info "info:" [:a {:href AbstractURL} AbstractSource]])]]))
-
