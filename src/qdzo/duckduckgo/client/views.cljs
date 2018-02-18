@@ -1,6 +1,7 @@
 (ns qdzo.duckduckgo.client.views
   (:require [clojure.string :refer [blank?]]))
 
+(def ENTER 13)
 
 (def non-blank?
   "predicate for non-blank string"
@@ -66,22 +67,61 @@
           Heading
           Image
           Entity]} response]
-    [:div.summary-panel
-     [:div.header
-      [:div.heading  Heading]
-      (when (non-blank? Image)
-        [:div.logo
-         [:img
-          {:src Image
-           :alt Heading}]])]
-     [:div.content
-      (when (non-blank? Entity)
-        [:div.entity
-         [:div.prop-name  "type: "]
-         Entity])
-      (when (non-blank? AbstractText)
-        [:div.definition
-         [:div.prop-name "Definition: "]
-         AbstractText])
-      (when (non-blank? AbstractSource)
-        [:div.info "info:" [:a {:href AbstractURL} AbstractSource]])]]))
+    (when (non-blank? Heading)
+      [:div.summary-panel
+       [:div.header
+        [:div.heading  Heading]
+        (when (non-blank? Image)
+          [:div.logo
+           [:img {:src Image :alt Heading}]])]
+       [:div.content
+        (when (non-blank? Entity)
+          [:div.entity
+           [:div.prop-name  "type: "]
+           Entity])
+        (when (non-blank? AbstractText)
+          [:div.definition
+           [:div.prop-name "Definition: "]
+           AbstractText])
+        (when (non-blank? AbstractSource)
+          [:div.info "info:" [:a {:href AbstractURL} AbstractSource]])]])))
+
+
+(defn input-panel [{:keys [input minimized on-change on-submit]}]
+  [:div#panel (if minimized {:class "minimized"})
+   [:div [:h1 "DuckDuckGo Instant Answers"]
+    [:input
+     {:type "text"
+      :placeholder "Enter query..."
+      :value input
+      :on-change #(on-change (.. % -target -value))
+      :on-key-down #(when (= (.. % -keyCode) ENTER)
+                       (on-submit input))}]
+    [:button#btn
+     {:on-click #(on-submit input)} "Ask me!"]]])
+
+(defn result-panel
+  [response]
+  (let [infobox-meta (get-in response [:Infobox :meta])
+        infobox-content (get-in response [:Infobox :content])
+        related-topics (response :RelatedTopics)
+        results-topics (response :Results)]
+    [:div.result
+     (when (non-blank? response)
+       [result-summary response])
+     (when (not-empty results-topics)
+      [topics
+       {:title "RESULT TOPICS"
+        :topics results-topics}])
+     (when (not-empty  related-topics)
+       [topics
+        {:title "RELATED TOPICS"
+         :topics related-topics}])
+     (when (non-blank? infobox-content)
+       [infobox
+        {:title "CONTENT"
+         :content infobox-content}])
+     (when (non-blank? infobox-meta)
+      [infobox
+       {:title    "META-CONTENT"
+        :content  infobox-meta}])]))
