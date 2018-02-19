@@ -36,6 +36,7 @@
   (js/history.pushState
    (clj->js app-state) nil (str "/query?q=" (:input app-state))))
 
+;; TODO: add client-routing, to block reloading app after url changes (by hand)
 (defn location-query []
   "Gets search from `js/location`
   if there are path like [root]/query?q=[search]"
@@ -43,14 +44,6 @@
              (str/starts-with? js/location.search "?q=")
              (> (count js/location.search) 3))
     (subs js/location.search 3)))
-
-(comment
-  (-> @state (dissoc :response))
-  (-> @state  :response :RelatedTopics (nth 1))
-
-  (-> @state  :response)
-
-  (swap! state assoc :sort #{}))
 
 (defn ask-duckduckgo [q]
   (go
@@ -108,7 +101,16 @@
                   (js/document.querySelector "#root")))
 
 (init-app)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; REPL STAFF ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(comment
+  (-> @state (dissoc :response))
+  (-> @state  :response :RelatedTopics (nth 1))
+
+  (-> @state  :response)
+
+  (swap! state assoc :sort #{}))
 
 ;; called by figwheel
 #_(defn on-js-reload []
