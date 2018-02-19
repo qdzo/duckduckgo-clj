@@ -1,6 +1,6 @@
 (ns qdzo.duckduckgo.server.core
   (:require [ring.adapter.jetty :as jetty]
-            ;; [ring.middleware.reload :refer [wrap-reload]] ;; try to live without this
+    ;; [ring.middleware.reload :refer [wrap-reload]] ;; try to live without this
             [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer :all]
@@ -13,6 +13,8 @@
   [msg]
   (json/generate-string {:warning msg}))
 
+(defonce server (atom nil))
+
 ;; (GET "/hello/:name{[a-z]{2}[0-9]+}"
 ;;   [name]
 ;;   (str "<h1>Hello " name "!</h1>"))
@@ -23,30 +25,42 @@
 ;;   [from to & z :as r]
 ;;   (str "Pong " from " to " to ". Unbound params: " z ". Req-map: " r))
 (defroutes app-routes
-  (GET "/" [] (index))
-  (GET "/index" [] (index))
-  (GET "/search" [q] (if q
-                       (json/generate-string (ask q))
-                       (warning-msg "Query can't be an empty string.")))
-  (route/resources "/assets/")
-  (route/not-found "<p>Page not found</p>"))
+           (GET "/" [] (index))
+           ;; stab for web-client. for loading with direct link: "[host]/search?q=[question]"
+           (GET "/query" [] (index))
+           (GET "/index" [] (index))
+           (GET "/search" [q] (if q
+                                (json/generate-string (ask q))
+                                (warning-msg "Query can't be an empty string.")))
+           (route/resources "/assets/")
+           (route/not-found "<p>Page not found</p>"))
 
 (def app
   "main app handler"
   (wrap-defaults
-   #'app-routes
-   site-defaults))
+    #'app-routes
+    site-defaults))
 
-#_(wrap-reload #'app) ;; try to live without this
+#_(wrap-reload #'app)                                       ;; try to live without this
 
 ;; jetty-run should return fn that stops server
-(defn run-server []
-  (future
-    (jetty/run-jetty #'app {:port 3000})))
+(defn run-server! []
+  (future (reset! server (jetty/run-jetty #'app {:port 3000}))))
+
+
+(defn stop-server! []
+  (when @server
+    (.stop @server)
+    (reset! server nil)))
+
 
 (comment
 
-  (def server (run-server))
+  @server
+
+  (run-server!)
+
+  (stop-server!)
 
   )
 

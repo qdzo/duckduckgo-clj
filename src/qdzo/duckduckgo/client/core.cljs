@@ -3,7 +3,8 @@
             [cljs.core.async :refer [<! >! put! chan timeout]]
             [cljs-http.client :as http]
             [qdzo.duckduckgo.common.styles :refer [style]]
-            [qdzo.duckduckgo.client.views :as v])
+            [qdzo.duckduckgo.client.views :as v]
+            [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 ;; simple logger
@@ -29,11 +30,19 @@
         (fn [e]
           (log "ON_POPSTATE called")
           (when-let [state (some-> (.-state e) (js->clj :keywordize-keys true))]
-            (dispatch :reset-app-state state)))))
+            (dispatch :set-app-state state)))))
 
 (defn push-state-to-history! [app-state]
   (js/history.pushState
-   (clj->js app-state) nil (str "/query/" (:input app-state))))
+   (clj->js app-state) nil (str "/query?q=" (:input app-state))))
+
+(defn location-query []
+  "Gets search from `js/location`
+  if there are path like [root]/query?q=[search]"
+  (when (and (= js/location.pathname "/query")
+             (str/starts-with? js/location.search "?q=")
+             (> (count js/location.search) 3))
+    (subs js/location.search 3)))
 
 (comment
   (-> @state (dissoc :response))
@@ -56,10 +65,12 @@
 
 (def actions
   {:ask ask-duckduckgo
-   :change-input #(swap! state assoc :input %)
-   :reset-app-state #(reset! state %)
+   :set-input #(swap! state assoc :input %)
+   :set-app-state #(reset! state %)
    :set-response #(let [new-state (swap! state assoc :response %)]
-                    (push-state-to-history! new-state))})
+                    (push-state-to-history! new-state))
+   :setup-initial-ask #(do (swap! state assoc :input %)
+                           (ask-duckduckgo %))})
 
 ;; (dispatch :ask "Clojurescript")
 
@@ -78,26 +89,26 @@
      [v/input-panel
       {:input input
        :minimized response ;; FIXME: set more accurate data here.
-       :on-change #(dispatch :change-input %)
+       :on-change #(dispatch :set-input %)
        :on-submit #(dispatch :ask %)}]
      (when response        ;; TODO: add view for empty results
        [v/result-panel response])]))
 
-(comment
-  (-> @state  :response))
+(defn on-mount [_]
+  (subscribe-onpopstate)
+  (when-let [query (location-query)]
+    (dispatch :set-input query)
+    (dispatch :ask query)))
 
+(defn wrap-app [app]
+  (with-meta app {:component-did-mount on-mount}))
 
 (defn init-app []
-  (subscribe-onpopstate)
-  (reagent/render [app]
+  (reagent/render [(wrap-app app)]
                   (js/document.querySelector "#root")))
 
 (init-app)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; REPL STAFF ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(comment
-  (+ 1 2 3))
-
 
 ;; called by figwheel
 #_(defn on-js-reload []
