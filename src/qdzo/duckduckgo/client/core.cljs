@@ -24,7 +24,7 @@
 (defn dispatch [action payload]
   (put! $events-chan [action payload]))
 
-(defn subscribe-onpopstate []
+(defn subscribe-on-pop-state []
   (log "Subscribe onpopstate")
   (set! js/window.onpopstate
         (fn [e]
@@ -38,12 +38,18 @@
 
 ;; TODO: add client-routing, to block reloading app after url changes (by hand)
 (defn location-query []
-  "Gets search from `js/location`
+  "Gets `search` from `js/location`
   if there are path like [root]/query?q=[search]"
   (when (and (= js/location.pathname "/query")
              (str/starts-with? js/location.search "?q=")
              (> (count js/location.search) 3))
     (subs js/location.search 3)))
+
+(defn handle-location-query []
+  "If location query exists, grab it's content and send query."
+  (when-let [query (location-query)]
+    (dispatch :set-input query)
+    (dispatch :ask query)))
 
 (defn ask-duckduckgo [q]
   (go
@@ -61,18 +67,16 @@
    :set-input #(swap! state assoc :input %)
    :set-app-state #(reset! state %)
    :set-response #(let [new-state (swap! state assoc :response %)]
-                    (push-state-to-history! new-state))
-   :setup-initial-ask #(do (swap! state assoc :input %)
-                           (ask-duckduckgo %))})
+                    (push-state-to-history! new-state))})
 
-;; (dispatch :ask "Clojurescript")
-
-(defonce -action-chan
-  (go
-    (while true
-      (let [[action payload] (<! $events-chan)
-            f (get actions action)]
-        (f payload)))))
+(defn action-dispatcher [channel actions]
+  "Reads `channel` for `[action payload]` pairs.
+   Searches for action in `actions` map and evaluates them"
+  (log "action-dispatcher starting")
+  (go (while true
+        (let [[action payload] (<! channel)
+              f (get actions action)]
+          (f payload)))))
 
 (defn app []
   (let [{:keys [input response]} @state]
@@ -87,20 +91,19 @@
      (when response        ;; TODO: add view for empty results
        [v/result-panel response])]))
 
-(defn on-mount [_]
-  (subscribe-onpopstate)
-  (when-let [query (location-query)]
-    (dispatch :set-input query)
-    (dispatch :ask query)))
+(defn setup-app-env! [_]
+  (action-dispatcher $events-chan actions)
+  (subscribe-on-pop-state)
+  (handle-location-query))
 
 (defn wrap-app [app]
-  (with-meta app {:component-did-mount on-mount}))
+  (with-meta app {:component-did-mount setup-app-env!}))
 
-(defn init-app []
+(defn render-app []
   (reagent/render [(wrap-app app)]
                   (js/document.querySelector "#root")))
 
-(init-app)
+(render-app)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; REPL STAFF ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -115,4 +118,4 @@
 ;; called by figwheel
 #_(defn on-js-reload []
    (log "[----------on-js-reload called---------]")
-   (subscribe-onpopstate))
+   (subscribe-on-pop-state))
