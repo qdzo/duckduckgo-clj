@@ -16,25 +16,22 @@
     {:ask (str url "search")
      :dummy-ask (str url "assets/dummy.edn")}))
 
-(defonce state (atom {:input "" :response nil}))
+(defn dispatcher [channel]
+  (fn [action payload]
+    (put! channel [action payload])))
 
-;; chanel for dispatching events
-(defonce $events-chan (chan))
-
-(defn dispatch [action payload]
-  (put! $events-chan [action payload]))
-
-(defn subscribe-on-pop-state []
+(defn subscribe-on-history-pop-state [cb]
   (log "Subscribe onpopstate")
   (set! js/window.onpopstate
         (fn [e]
           (log "ON_POPSTATE called")
           (when-let [state (some-> (.-state e) (js->clj :keywordize-keys true))]
-            (dispatch :set-app-state state)))))
+            (cb state)))))
 
 (defn push-state-to-history! [app-state]
-  (js/history.pushState
-   (clj->js app-state) nil (str "/query?q=" (:input app-state))))
+  (js/history.pushState (clj->js app-state)
+                        nil
+                        (str "/query?q=" (:input app-state))))
 
 ;; TODO: add client-routing, to block reloading app after url changes (by hand)
 (defn location-query []
@@ -45,29 +42,19 @@
              (> (count js/location.search) 3))
     (subs js/location.search 3)))
 
-(defn handle-location-query []
+(defn handle-location-query [cb]
   "If location query exists, grab it's content and send query."
   (when-let [query (location-query)]
-    (dispatch :set-input query)
-    (dispatch :ask query)))
+    (cb query)))
 
-(defn ask-duckduckgo [q]
-  (go
-    (let [response
-          (-> (:ask api)
-              (http/get {:query-params {:q q}})
-              <!
-              :body
-              (js/JSON.parse)
-              (js->clj :keywordize-keys true))]
-      (dispatch :set-response response))))
-
-(def actions
-  {:ask ask-duckduckgo
-   :set-input #(swap! state assoc :input %)
-   :set-app-state #(reset! state %)
-   :set-response #(let [new-state (swap! state assoc :response %)]
-                    (push-state-to-history! new-state))})
+(defn ask-duckduckgo [query cb]
+  (go (-> (:ask api)
+          (http/get {:query-params {:q query}})
+          (<!)
+          (:body)
+          (js/JSON.parse)
+          (js->clj :keywordize-keys true)
+          (cb))))
 
 (defn action-dispatcher [channel actions]
   "Reads `channel` for `[action payload]` pairs.
@@ -78,7 +65,7 @@
               f (get actions action)]
           (f payload)))))
 
-(defn app []
+(defn app [state dispatch]
   (let [{:keys [input response]} @state]
     (log "APP RENDER")
     [:div#app
@@ -91,17 +78,32 @@
      (when response        ;; TODO: add view for empty results
        [v/result-panel response])]))
 
-(defn setup-app-env! [_]
-  (action-dispatcher $events-chan actions)
-  (subscribe-on-pop-state)
-  (handle-location-query))
+(defonce state (atom {:input "" :response nil}))
 
-(defn wrap-app [app]
-  (with-meta app {:component-did-mount setup-app-env!}))
+(defn actions [state dispatch]
+  {:ask #(ask-duckduckgo % (partial dispatch :set-response))
+   :set-input #(swap! state assoc :input %)
+   :set-app-state #(reset! state %)
+   :set-response #(let [new-state (swap! state assoc :response %)]
+                    (push-state-to-history! new-state))})
+
+(defn wrap-app [app dispatch]
+  (with-meta
+    app
+    {:component-did-mount
+     (fn [_]
+       (subscribe-on-history-pop-state (partial dispatch :set-app-state))
+       (handle-location-query #(do (dispatch :change-input %)
+                                   (dispatch :ask %))))}))
+
 
 (defn render-app []
-  (reagent/render [(wrap-app app)]
-                  (js/document.querySelector "#root")))
+  (let [ch (chan)
+        dispatch (dispatcher ch)
+        actions (actions state dispatch) ]
+    (action-dispatcher ch actions)
+    (reagent/render [app state dispatch]
+                    (js/document.querySelector "#root"))))
 
 (render-app)
 
@@ -111,11 +113,11 @@
   (-> @state (dissoc :response))
   (-> @state  :response :RelatedTopics (nth 1))
 
-  (-> @state  :response)
+  (-> @state   keys)
 
   (swap! state assoc :sort #{}))
 
 ;; called by figwheel
 #_(defn on-js-reload []
    (log "[----------on-js-reload called---------]")
-   (subscribe-on-pop-state))
+   (subscribe-on-history-pop-state))
