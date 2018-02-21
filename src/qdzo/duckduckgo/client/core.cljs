@@ -16,10 +16,6 @@
     {:ask (str url "search")
      :dummy-ask (str url "assets/dummy.edn")}))
 
-(defn dispatcher [channel]
-  (fn [action payload]
-    (put! channel [action payload])))
-
 (defn subscribe-on-history-pop-state [cb]
   (log "Subscribe onpopstate")
   (set! js/window.onpopstate
@@ -28,10 +24,13 @@
           (when-let [state (some-> (.-state e) (js->clj :keywordize-keys true))]
             (cb state)))))
 
+(defn make-query-url [query]
+  (str "/query?q=" query))
+
 (defn push-state-to-history! [app-state]
   (js/history.pushState (clj->js app-state)
                         nil
-                        (str "/query?q=" (:input app-state))))
+                        (make-query-url (:input app-state))))
 
 ;; TODO: add client-routing, to block reloading app after url changes (by hand)
 (defn location-query []
@@ -55,6 +54,10 @@
           (js/JSON.parse)
           (js->clj :keywordize-keys true)
           (cb))))
+
+(defn dispatcher [channel]
+  (fn [action payload]
+    (put! channel [action payload])))
 
 (defn action-dispatcher [channel actions]
   "Reads `channel` for `[action payload]` pairs.
