@@ -150,6 +150,9 @@
     ;; :position "relative"
     :padding (u/px 7)}
 
+   ;; NOTE: remove border for nested topics views
+   [:div.topics-panel {:border 0}]
+
    [:div.topics-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
@@ -206,6 +209,7 @@
     :overflow-y "auto"
     :flex-direction "column"
     :display "flex"
+    :flex-grow 4
     :padding-right (u/vh 35)
     :padding-left (u/vh 35)}
 

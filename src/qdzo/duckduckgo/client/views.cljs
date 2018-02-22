@@ -31,22 +31,27 @@
               {:label "two"}]]
     (sort (comp not nil? toggled :label) data)))
 
-
+(defn sub-topic? [topic]
+  (contains? topic :Topics))
 
 ;; Results.[{Icon{Height,Width,URL}, FirstURL, Text}]
 ;; RelatedTopics[{Text,Icon,FirstURL}]
 (defn topics
   "View for `Results` and `RelatedTopics` data"
-  [{:keys [title topics]}]
+  [{title :title tops :topics}]
   [:div.topics-panel
    [:strong title]
    [:div.topics-content
     [:ul
-     (for [item topics]
+     (for [item tops]
        ^{:key item}
-       [:li [:a {:href (:FirstURL item)
-                 :target "_blank"}
-             (:Text item)]])]]])
+       [:li (if (sub-topic? item)
+              [topics {:title (:Name item)
+                       :topics (:Topics item)}]
+              [:a {:href (:FirstURL item)
+                   :target "_blank"}
+               (:Text item)])
+        ])]]])
 
 
 ;; Entity (string) (what kind of searched entity)

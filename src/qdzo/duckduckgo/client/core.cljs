@@ -117,7 +117,7 @@
 
 (comment
   (-> @state (dissoc :response))
-  (-> @state  :response :RelatedTopics (nth 1))
+  (-> @state  :response :RelatedTopics )
 
   (-> @state   keys)
 
