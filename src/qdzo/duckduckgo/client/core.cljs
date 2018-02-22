@@ -12,9 +12,9 @@
 
 ;; TODO: add api for serving path {root}/query/query-string
 (def api
-  (let [url "http://localhost:3000/"]
-    {:ask (str url "search")
-     :dummy-ask (str url "assets/dummy.edn")}))
+  (let [url js/window.location.origin]
+    {:ask (str url "/search")
+     :dummy-ask (str url "/assets/dummy.edn")}))
 
 (defn subscribe-on-history-pop-state [cb]
   (log "Subscribe onpopstate")
