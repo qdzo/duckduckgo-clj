@@ -40,7 +40,8 @@
   (when (and (= js/location.pathname "/query")
              (str/starts-with? js/location.search "?q=")
              (> (count js/location.search) 3))
-    (subs js/location.search 3)))
+    (-> (subs js/location.search 3)
+        (js/decodeURIComponent))))
 
 (defn handle-location-query [cb]
   "If location query exists, grab it's content and send query."
