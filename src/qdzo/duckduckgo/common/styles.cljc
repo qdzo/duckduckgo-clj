@@ -73,13 +73,14 @@
    [:&.minimized {:display "block"}]
 
    [:h1 {:margin-top  (u/px 7)
-         :font-size   default-header-font-size
+         :font-size   (+ default-header-font-size 6.4)
          :font-weight "lighter"}]
 
    ["input::-webkit-input-placeholder" {:color "white"}]
 
    [:input
     {:margin-right  (u/px 10)
+     :margin-top (u/px -1)
      :height        (u/px 34)
      :width         (u/px 270)
      :font-size     default-font-size
@@ -174,12 +175,9 @@
      :justify-content "space-between"}
 
     [:.heading
-     {
-      :font-size   (+ default-header-font-size 6)
-      :quotes      "“"
+     {:font-size   (+ default-header-font-size 26)
       :margin-left (u/px 7)
       :margin-top  (u/px 5)
-      :max-width   (u/px 150)
       :font-style  "italic"}]
 
     [:.logo
