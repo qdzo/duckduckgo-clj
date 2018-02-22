@@ -3,6 +3,8 @@
             [garden.units :as u]
             [garden.stylesheet :refer [at-media]]))
 
+(def default-font-size 22)
+(def default-header-font-size 23)
 (def default-background-color "#352727")
 (def default-color "white")
 (def default-border-color "#6868f1")
@@ -15,13 +17,16 @@
   [:body
    {;; :background "#d4d4d4"
     :background default-background-color ;; good with color white
-    :color default-color
-    :height "100%"
-    :width "100%"
-    :margin 0
-    :padding 0
-    :font-size (u/px 20)}
-    [:strong {:font-size (u/rem 1.2)}]
+    :color      default-color
+    :height     "100%"
+    :width      "100%"
+    :margin     0
+    :padding    0
+    :font-size  default-font-size
+    }
+    [:strong {
+              :font-size default-header-font-size
+              }]
    [:#app
     {:width "100%"
      :height "100%"
@@ -34,7 +39,7 @@
    [:ul {:padding-left (u/px 22)}
     [:li {:padding-bottom (u/px 5)}]]
    [:button
-    {:font-size (u/rem 1.0)
+    {
      :padding-bottom (u/px 1)
      :color "white"
      :background-color default-btn-color
@@ -57,32 +62,34 @@
     :transition "1s"
     :align-items :center}
    [:&.minimized {:display "block"}]
-   [:h1 {:margin-top (u/px 7)
-         :font-size (u/rem 1.9)
+   [:h1 {:margin-top  (u/px 7)
+         :font-size   default-header-font-size
          :font-weight "lighter"}]
    ["input::-webkit-input-placeholder" {:color "white"}]
    [:input
-    {:margin-right (u/px 10)
-     :height (u/px 34)
-     :width (u/px 270)
-     :font-size (u/rem 1.2)
-     :background :transparent
-     :border-top 0
-     :border-left 0
-     :border-right 0
-     :outline 0
-     :color "white"
+    {:margin-right  (u/px 10)
+     :height        (u/px 34)
+     :width         (u/px 270)
+     :font-size     default-font-size
+     :background    :transparent
+     :border-top    0
+     :border-left   0
+     :border-right  0
+     :outline       0
+     :color         "white"
      :border-bottom (str "1px solid " default-btn-color)
-     :transition "300ms"
-     :text-align "center"}
+     :transition    "300ms"
+     :text-align    "center"}
 
     [:&:focus :&:hover
      {:border-bottom (str "2px solid " default-btn-hover-color)
       :height (u/px 33)}]]
    [:#btn
-    {:width (u/px 70)
-     :height (u/px 35)
-     :font-size (u/rem 0.85)
+    {
+     ;:width (u/px 70)
+     :height     (u/px 35)
+
+     :font-size  (- default-font-size 4)
      :transition "300ms"}
     [:&:focus {}]
     [:&:hover {}]]])
@@ -111,7 +118,7 @@
             :width "100%"
             :border "none"
             :cellspacing 0
-            :font-size (u/rem 1.2)
+            :font-size default-font-size
             :cellpadding 0}]
    [:tr :td :th
     {:border "0px solid white"
@@ -129,7 +136,6 @@
     :padding (u/px 7)}
    [:div.topics-content
     {:padding-top (u/px 5)
-     :font-size (u/rem 1.3)
      :padding-bottom (u/px 5)
      :margin-top (u/px 2)
      :margin-bottom (u/px 5)
@@ -142,18 +148,18 @@
     :border-radius default-border-radius
     :margin (u/px 7)
     :margin-bottom (u/px 0)
-    :font-size (u/rem 1.2)
     :padding (u/px 7)}
    [:.header
     {:display "flex"
      :justify-content "space-between"}
     [:.heading
-     {:font-size (u/rem 1.9)
-      :quotes "“"
+     {
+      :font-size   (+ default-header-font-size 6)
+      :quotes      "“"
       :margin-left (u/px 7)
-      :margin-top (u/px 5)
-      :max-width (u/px 150)
-      :font-style "italic"}]
+      :margin-top  (u/px 5)
+      :max-width   (u/px 150)
+      :font-style  "italic"}]
     [:.logo
      {:height (u/px 64)
       :margin (u/px 5)}
@@ -173,7 +179,6 @@
 (def result-panel-style
   [:.result
    {:margin-top (u/px 7)
-    :font-size (u/rem 1.2)
     :overflow-y "auto"
     :flex-direction "column"
     :display "flex"
@@ -210,7 +215,7 @@
    [:.prop-name
     {:font-style "italic"
      :display "inline"
-     :font-size (u/rem 1.3)}]])
+     }]])
 
 (def style
   (css body-style

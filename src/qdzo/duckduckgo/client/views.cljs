@@ -44,7 +44,8 @@
     [:ul
      (for [item topics]
        ^{:key item}
-       [:li [:a {:href (:FirstURL item)}
+       [:li [:a {:href (:FirstURL item)
+                 :target "_blank"}
              (:Text item)]])]]])
 
 
@@ -84,7 +85,8 @@
            [:div.prop-name "Definition: "]
            AbstractText])
         (when (non-blank? AbstractSource)
-          [:div.info "info:" [:a {:href AbstractURL} AbstractSource]])]])))
+          [:div.info "info:" [:a {:href AbstractURL :target "_blank"}
+                              AbstractSource]])]])))
 
 
 (defn input-panel [{:keys [input minimized on-change on-submit]}]
