@@ -1,10 +1,11 @@
 (ns qdzo.duckduckgo.client.core
-  (:require [reagent.core :as reagent :refer (atom)]
-            [cljs.core.async :refer [<! >! put! chan timeout]]
-            [cljs-http.client :as http]
-            [qdzo.duckduckgo.common.styles :refer [style]]
-            [qdzo.duckduckgo.client.views :as v]
-            [clojure.string :as str])
+  (:require
+    [reagent.core :as reagent :refer (atom)]
+    [cljs.core.async :refer [<! >! put! chan timeout]]
+    [cljs-http.client :as http]
+    [qdzo.duckduckgo.common.styles :refer [style]]
+    [qdzo.duckduckgo.client.views :as v]
+    [clojure.string :as str])
   (:require-macros [cljs.core.async.macros :refer [go]]))
 
 ;; simple logger
@@ -20,9 +21,9 @@
   (log "Subscribe onpopstate")
   (set! js/window.onpopstate
         (fn [e]
-          (log "ON_POPSTATE called")
-          (when-let [state (some-> (.-state e) (js->clj :keywordize-keys true))]
-            (cb state)))))
+          (some-> (.-state e)
+                  (js->clj :keywordize-keys true)
+                  (cb)))))
 
 (defn make-query-url [query]
   (str "/query?q=" query))
@@ -44,6 +45,7 @@
 (defn handle-location-query [cb]
   "If location query exists, grab it's content and send query."
   (when-let [query (location-query)]
+    (log "Location query catch up")
     (cb query)))
 
 (defn ask-duckduckgo [query cb]
@@ -55,7 +57,7 @@
           (js->clj :keywordize-keys true)
           (cb))))
 
-(defn dispatcher [channel]
+(defn make-dispatch-fn [channel]
   (fn [action payload]
     (put! channel [action payload])))
 
@@ -90,20 +92,21 @@
    :set-response #(let [new-state (swap! state assoc :response %)]
                     (push-state-to-history! new-state))})
 
-(defn wrap-app [app dispatch]
+(defn on-mount [app dispatch]
   (with-meta
     app
     {:component-did-mount
      (fn [_]
        (subscribe-on-history-pop-state (partial dispatch :set-app-state))
-       (handle-location-query #(do (dispatch :change-input %)
+       (handle-location-query #(do (dispatch :set-input %)
                                    (dispatch :ask %))))}))
 
 
 (defn render-app []
   (let [ch (chan)
-        dispatch (dispatcher ch)
-        actions (actions state dispatch) ]
+        dispatch (make-dispatch-fn ch)
+        actions (actions state dispatch)
+        app (on-mount app dispatch)]
     (action-dispatcher ch actions)
     (reagent/render [app state dispatch]
                     (js/document.querySelector "#root"))))
