@@ -1,6 +1,7 @@
 (ns qdzo.duckduckgo.common.styles
   (:require [garden.core :refer [css]]
-            [garden.units :as u]))
+            [garden.units :as u]
+            [garden.stylesheet :refer [at-media]]))
 
 (def default-background-color "#352727")
 (def default-color "white")
@@ -20,7 +21,7 @@
     :margin 0
     :padding 0
     :font-size (u/px 20)}
-
+    [:strong {:font-size (u/rem 1.2)}]
    [:#app
     {:width "100%"
      :height "100%"
@@ -64,7 +65,7 @@
     {:margin-right (u/px 10)
      :height (u/px 34)
      :width (u/px 270)
-     :font-size (u/rem 1.0)
+     :font-size (u/rem 1.2)
      :background :transparent
      :border-top 0
      :border-left 0
@@ -92,14 +93,8 @@
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
     :margin (u/px 7)
-    ;; :margin-top (u/px 5)
     :margin-bottom (u/px 0)
     :padding (u/px 7)}
-    ;; :overflow-y "hidden"
-    ;; :position "relative"
-    ;; :width "50%"
-    ;; :height "30%"
-
    [:div.infobox-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
@@ -147,12 +142,13 @@
     :border-radius default-border-radius
     :margin (u/px 7)
     :margin-bottom (u/px 0)
+    :font-size (u/rem 1.2)
     :padding (u/px 7)}
    [:.header
     {:display "flex"
      :justify-content "space-between"}
     [:.heading
-     {:font-size (u/px 27)
+     {:font-size (u/rem 1.9)
       :quotes "“"
       :margin-left (u/px 7)
       :margin-top (u/px 5)
@@ -172,23 +168,49 @@
    [:.info
     {:display "flex"
      :justify-content "center"}]]) ;; TODO change to right
-     ;; TODO change color
+;; TODO change color
 
 (def result-panel-style
   [:.result
    {:margin-top (u/px 7)
+    :font-size (u/rem 1.2)
     :overflow-y "auto"
-    ;; :min-height (u/px 200)
-    ;; :flex-grow 1
     :flex-direction "column"
-    :display "flex"}
+    :display "flex"
+    :padding-right (u/vh 35)
+    :padding-left (u/vh 35)}
+   (at-media
+     {:max-width (u/px 1480)}
+     [:&.result
+      {:padding-right (u/vh 30)
+       :padding-left (u/vh 30)}])
+   (at-media
+     {:max-width (u/px 1350)}
+     [:&.result
+      {:padding-right (u/vh 20)
+       :padding-left (u/vh 20)}])
+   (at-media
+     {:max-width (u/px 1150)}
+     [:&.result
+      {:padding-right (u/vh 15)
+       :padding-left (u/vh 15)}])
+   (at-media
+     {:max-width (u/px 1050)}
+     [:&.result
+      {:padding-right (u/vh 10)
+       :padding-left (u/vh 10)}])
+   (at-media
+     {:max-width (u/px 980)}
+     [:&.result
+      {:padding-right 0
+       :padding-left 0}])
    summary-panel-style
    topics-panel-style
    infobox-panel-style
    [:.prop-name
     {:font-style "italic"
      :display "inline"
-     :font-size (u/px 20)}]])
+     :font-size (u/rem 1.3)}]])
 
 (def style
   (css body-style
