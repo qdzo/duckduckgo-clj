@@ -1,5 +1,6 @@
 (ns qdzo.duckduckgo.client.views
-  (:require [clojure.string :refer [blank?]]))
+  (:require [clojure.string :refer [blank?]]
+            [reagent.core :as r]))
 
 (def ENTER 13)
 
@@ -100,12 +101,12 @@
     [:input
      {:type "text"
       :placeholder "Enter query..."
-      :value input
+      :value @input
       :on-change #(on-change (.. % -target -value))
       :on-key-down #(when (= (.. % -keyCode) ENTER)
-                       (on-submit input))}]
+                       (on-submit @input))}]
     [:button#btn
-     {:on-click #(on-submit input)} "Ask me!"]]])
+     {:on-click #(on-submit @input)} "Ask me!"]]])
 
 (defn result-panel
   [response]

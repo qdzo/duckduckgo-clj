@@ -72,17 +72,18 @@
           (f payload)))))
 
 (defn app [state dispatch]
-  (let [{:keys [input response]} @state]
+  (let [response-cursor (reagent/cursor state [:response])
+        input-cursor (reagent/cursor state [:input])]
     (log "APP RENDER")
     [:div#app
      [:style style]
      [v/input-panel
-      {:input input
-       :minimized response ;; FIXME: set more accurate data here.
+      {:input input-cursor
+       :minimized @response-cursor ;; FIXME: set more accurate data here.
        :on-change #(dispatch :set-input %)
        :on-submit #(dispatch :ask %)}]
-     (when response        ;; TODO: add view for empty results
-       [v/result-panel response])]))
+     (when @response-cursor        ;; TODO: add view for empty results
+       [v/result-panel @response-cursor])]))
 
 (defonce state (atom {:input "" :response nil}))
 
