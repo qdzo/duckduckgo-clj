@@ -3,8 +3,8 @@
             [garden.units :as u]
             [garden.stylesheet :refer [at-media]]))
 
-(def default-font-size 22)
-(def default-header-font-size 23)
+(def default-font-size 21)
+(def default-header-font-size 22)
 (def default-background-color "#352727")
 (def default-color "white")
 (def default-border-color "#6868f1")
@@ -35,13 +35,14 @@
 
    [:a {:color default-color}
 
-    [:&:visited {:color default-btn-active-color}] ;; TODO change colors
+    [:&:visited {:color default-btn-active-color}]
 
     [:&:hover {:color default-btn-hover-color}]]
 
-   [:ul {:padding-left (u/px 22)}
+   [:ul {:padding-left (u/px 22)
+         :margin-bottom 0}
 
-    [:li {:padding-bottom (u/px 5)}]]
+    [:li {:padding-bottom (u/px 10)}]]
 
    [:button
     {
@@ -112,8 +113,8 @@
    {:color default-color
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
-    :margin (u/px 7)
-    :margin-bottom (u/px 0)
+    :margin (u/px 10)
+    :margin-top (u/px 0)
     :padding (u/px 7)}
 
    [:div.infobox-content
@@ -146,8 +147,8 @@
    {:color default-color
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
-    :margin (u/px 7)
-    :margin-bottom (u/px 0)
+    :margin (u/px 10)
+    :margin-top (u/px 0)
     ;; :position "relative"
     :padding (u/px 7)}
 
@@ -166,8 +167,8 @@
    {;; :width "40%"
     :border (str "1px solid " default-border-color)
     :border-radius default-border-radius
-    :margin (u/px 7)
-    :margin-bottom (u/px 0)
+    :margin (u/px 10)
+    :margin-top (u/px 0)
     :padding (u/px 7)}
 
    [:.header
@@ -190,7 +191,8 @@
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
      :margin-top (u/px 2)
-     :margin-bottom (u/px 5)}]
+     :margin-bottom (u/px 5)
+     :line-height (u/px (+ default-font-size 8))}]
 
    [:.entity {:margin-bottom (u/px 10)}]
 
