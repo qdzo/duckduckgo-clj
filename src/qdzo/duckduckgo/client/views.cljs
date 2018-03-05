@@ -13,7 +13,7 @@
 (defn infobox
   "View for `Infobox.content` and `Infobox.meta` data"
   [{:keys [title content]}]
-  [:div.infobox-panel
+  [:div.panel.infobox-panel
    [:strong title]
    [:div.infobox-content
     [:table
@@ -40,7 +40,7 @@
 (defn topics
   "View for `Results` and `RelatedTopics` data"
   [{title :title tops :topics}]
-  [:div.topics-panel
+  [:div.panel.topics-panel
    [:strong title]
    [:div.topics-content
     [:ul
@@ -75,7 +75,7 @@
           Image
           Entity]} response]
     (when (non-blank? Heading)
-      [:div.summary-panel
+      [:div.panel.summary-panel
        [:div.header
         [:div.heading  Heading]
         (when (non-blank? Image)
@@ -84,14 +84,14 @@
        [:div.content
         (when (non-blank? Entity)
           [:div.entity
-           [:div.prop-name  "type: "]
+           [:strong.prop-name  "Type: "]
            Entity])
         (when (non-blank? AbstractText)
           [:div.definition
-           [:div.prop-name "Definition: "]
+           [:strong.prop-name "Definition: "]
            AbstractText])
         (when (non-blank? AbstractSource)
-          [:div.info "info:" [:a {:href AbstractURL :target "_blank"}
+          [:strong.info "info:" [:a {:href AbstractURL :target "_blank"}
                               AbstractSource]])]])))
 
 

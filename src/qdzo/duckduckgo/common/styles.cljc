@@ -7,10 +7,12 @@
 (def default-header-font-size 22)
 (def default-background-color "#352727")
 (def default-color "white")
+(def default-header-color "pink")
 (def default-border-color "#6868f1")
 (def default-btn-color "#8282d4")
 (def default-btn-hover-color "#8292e2")
 (def default-btn-active-color "#8292e2") ;; TODO change color
+(def default-visited-link-color "#6772abe6")
 (def default-border-radius (u/px 3))
 
 (def body-style
@@ -24,7 +26,9 @@
     :padding    0
     :font-size  default-font-size}
 
-    [:strong {:font-size default-header-font-size}]
+   [:strong {:font-size default-header-font-size
+             :color default-header-color
+             :margin-bottom "20px"}]
 
    [:#app
     {:width "100%"
@@ -33,9 +37,14 @@
      :flex-direction :column
      :justify-content :center}]
 
-   [:a {:color default-color}
+   [:a {:color default-color
+        ;; :display "block"
+        :overflow "hidden"
+        :text-overflow "ellipsis"
+        :white-space "nowrap"
+        :max-width (u/vmax 100)}
 
-    [:&:visited {:color default-btn-active-color}]
+    [:&:visited {:color default-visited-link-color}]
 
     [:&:hover {:color default-btn-hover-color}]]
 
@@ -58,7 +67,17 @@
     [:&:hover {:cursor :pointer
                :background-color default-btn-hover-color}]
 
-    [:&:active {:background-color "RED"}]]]) ;; TODO change color
+    [:&:active {:background-color "RED"}]]
+
+   [:.panel
+    {
+     :background-color default-background-color
+     ;; :border-radius default-background-color
+     ;; :box-shadow (str "0 1px 2px 0 " default-background-color)
+     :color default-color
+     :margin (u/px 10)
+     :margin-top (u/px 0)
+     :padding (u/px 7) }]])
 
 (def input-panel-style
   [:#panel
@@ -110,10 +129,7 @@
 
 (def infobox-panel-style
   [:div.infobox-panel
-   {:color default-color
-    :border (str "1px solid " default-border-color)
-    :border-radius default-border-radius
-    :margin (u/px 10)
+   #_{:margin (u/px 10) ;; TODO: delete common style
     :margin-top (u/px 0)
     :padding (u/px 7)}
 
@@ -131,25 +147,23 @@
    [:table {:border-collapse "collapse"
             :margin-top (u/px 5)
             ;; FIXME: remove this 3 lines
-            :width "100%"
-            :border "none"
-            :cellspacing 0
+            ;; :width "100%"
+            ;; :border "none"
+            ;; :cellspacing 0
             :font-size default-font-size
             :cellpadding 0}]
 
    [:tr :td :th
-    {:border "0px solid white"
-     :border-bottom (str "1px solid" default-border-color)
-     :padding (u/px 5)}]])
+    {;; :border "0px solid white"
+     ;; :border-bottom (str "1px solid" default-border-color)
+     :padding (u/px 7)}]
+   [:td [:&:first-child {:text-align "right"
+                         :color default-header-color}]]])
 
 (def topics-panel-style
   [:div.topics-panel
-   {:color default-color
-    :border (str "1px solid " default-border-color)
-    :border-radius default-border-radius
-    :margin (u/px 10)
+   #_{:margin (u/px 10)
     :margin-top (u/px 0)
-    ;; :position "relative"
     :padding (u/px 7)}
 
    ;; NOTE: remove border for nested topics views
@@ -164,9 +178,12 @@
 
 (def summary-panel-style
   [:.summary-panel
-   {;; :width "40%"
-    :border (str "1px solid " default-border-color)
-    :border-radius default-border-radius
+   #_{;; :width "40%"
+    ;; :border (str "1px solid " default-border-color)
+    ;; :border (str "1px solid " default-border-color)
+    ;; TODO: remove next commented lines
+    ;; :box-shadow (str "0 1px 2px 0 " default-border-color)
+    ;; :border-radius default-border-radius
     :margin (u/px 10)
     :margin-top (u/px 0)
     :padding (u/px 7)}
