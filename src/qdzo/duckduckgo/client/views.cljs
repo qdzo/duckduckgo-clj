@@ -112,26 +112,21 @@
 
 (defn result-panel
   [response]
-  (let [infobox-meta (get-in response [:Infobox :meta])
-        infobox-content (get-in response [:Infobox :content])
+  (let [infobox-content (get-in response [:Infobox :content])
         related-topics (response :RelatedTopics)
         results-topics (response :Results)]
     [:div.result
      (when (non-blank? response)
        [result-summary response])
-     (when (not-empty results-topics)
-      [topics
-       {:title "RESULT TOPICS"
-        :topics results-topics}])
-     (when (not-empty  related-topics)
-       [topics
-        {:title "RELATED TOPICS"
-         :topics related-topics}])
      (when (non-blank? infobox-content)
        [infobox
         {:title "CONTENT"
          :content infobox-content}])
-     (when (non-blank? infobox-meta)
-      [infobox
-       {:title    "META-CONTENT"
-        :content  infobox-meta}])]))
+     (when (not-empty results-topics)
+       [topics
+        {:title "RESULT TOPICS"
+         :topics results-topics}])
+     (when (not-empty  related-topics)
+       [topics
+        {:title "RELATED TOPICS"
+         :topics related-topics}])]))
