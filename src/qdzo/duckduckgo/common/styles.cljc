@@ -7,7 +7,7 @@
 (def default-header-font-size 22)
 (def default-background-color "#352727")
 (def default-color "white")
-(def default-header-color "pink")
+(def default-header-color "#af8088")
 (def default-border-color "#6868f1")
 (def default-btn-color "#8282d4")
 (def default-btn-hover-color "#8292e2")
@@ -37,19 +37,15 @@
      :flex-direction :column
      :justify-content :center}]
 
-   [:a {:color default-color
-        ;; :display "block"
-        :overflow "hidden"
-        :text-overflow "ellipsis"
-        :white-space "nowrap"
-        :max-width (u/vmax 100)}
+   [:a {:color default-color}
 
     [:&:visited {:color default-visited-link-color}]
 
     [:&:hover {:color default-btn-hover-color}]]
 
    [:ul {:padding-left (u/px 22)
-         :margin-bottom 0}
+         :margin-bottom 0
+         :color default-header-color}
 
     [:li {:padding-bottom (u/px 10)}]]
 
@@ -94,7 +90,7 @@
 
    [:h1 {:margin-top  (u/px 7)
          :font-size   (+ default-header-font-size 6.4)
-         :font-weight "lighter"}]
+         :font-weight 200}]
 
    ["input::-webkit-input-placeholder" {:color "white"}]
 
@@ -129,27 +125,15 @@
 
 (def infobox-panel-style
   [:div.infobox-panel
-   #_{:margin (u/px 10) ;; TODO: delete common style
-    :margin-top (u/px 0)
-    :padding (u/px 7)}
-
    [:div.infobox-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
      :margin-top (u/px 2)
      :margin-bottom (u/px 5)
-     ;; :height "85%"
-     ;; :width "90%"
-     ;; :min-width "400px"
-     ;; :position "absolute"
      :overflow-y "auto"}]
 
    [:table {:border-collapse "collapse"
             :margin-top (u/px 5)
-            ;; FIXME: remove this 3 lines
-            ;; :width "100%"
-            ;; :border "none"
-            ;; :cellspacing 0
             :font-size default-font-size
             :cellpadding 0}]
 
@@ -162,13 +146,6 @@
 
 (def topics-panel-style
   [:div.topics-panel
-   #_{:margin (u/px 10)
-    :margin-top (u/px 0)
-    :padding (u/px 7)}
-
-   ;; NOTE: remove border for nested topics views
-   [:div.topics-panel {:border 0}]
-
    [:div.topics-content
     {:padding-top (u/px 5)
      :padding-bottom (u/px 5)
@@ -178,16 +155,6 @@
 
 (def summary-panel-style
   [:.summary-panel
-   #_{;; :width "40%"
-    ;; :border (str "1px solid " default-border-color)
-    ;; :border (str "1px solid " default-border-color)
-    ;; TODO: remove next commented lines
-    ;; :box-shadow (str "0 1px 2px 0 " default-border-color)
-    ;; :border-radius default-border-radius
-    :margin (u/px 10)
-    :margin-top (u/px 0)
-    :padding (u/px 7)}
-
    [:.header
     {:display "flex"
      :justify-content "space-between"}
@@ -218,7 +185,6 @@
    [:.info
     {:display "flex"
      :justify-content "center"}]]) ;; TODO change to right
-;; TODO change color
 
 (def result-panel-style
   [:.result

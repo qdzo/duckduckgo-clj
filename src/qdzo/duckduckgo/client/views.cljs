@@ -91,8 +91,10 @@
            [:strong.prop-name "Definition: "]
            AbstractText])
         (when (non-blank? AbstractSource)
-          [:strong.info "info:" [:a {:href AbstractURL :target "_blank"}
-                              AbstractSource]])]])))
+          [:div.info
+           [:strong.prop-name "info:"]
+           [:a {:href AbstractURL :target "_blank"}
+            AbstractSource]])]])))
 
 
 (defn input-panel [{:keys [input minimized on-change on-submit]}]
