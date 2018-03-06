@@ -5,7 +5,8 @@
    [clj-json.core :as json]
    [clojure.spec.alpha :as s]
    [clojure.spec.gen.alpha :as gen]
-   [clojure.spec.test.alpha :as stest]))
+   [clojure.spec.test.alpha :as stest]
+   [clojure.string :as str]))
 
 ;;;;               Simplified response from duckduckgo for query - 'clojure'
 ;;
@@ -68,8 +69,7 @@
 (s/def :Infobox/content
   (s/coll-of :content/content))
 
-(s/def :Infobox/meta
-  (s/coll-of :content/content))
+(s/def :Infobox/meta :Infobox/content)
 
 (s/def :response/Infobox
   (s/or :plain string?
@@ -127,6 +127,20 @@
                    :response/Heading]
           :opt-un [:response/AbstractSourse]))
 
+(defn duckduckgo-response-empty? [response]
+  (let [select-values (comp vals select-keys)
+        topics-keys [:Results :RelatedTopics]
+        topics (select-values response topics-keys)
+        text-keys [:Heading :AbstractText :AbstractURL :AbstractSource :Abstract :Type]
+        texts (select-values response text-keys)]
+    (and (every? empty? topics)
+         (every? str/blank? texts))))
+
+(s/def :duckduckgo/empty-response
+  (s/and :duckduckgo/response
+         duckduckgo-response-empty?))
+
+
 (comment
 
   ;; some testings
@@ -159,7 +173,8 @@
         sanitize-conformed-content-value #(update % :value second)
         sanitize-content-coll (partial mapv #(-> % (select-keys [:label :value])
                                                  sanitize-conformed-content-value))
-        sanitize-complex-infobox #(-> % (update :content sanitize-content-coll)
+        sanitize-complex-infobox #(-> %
+                                      (update :content sanitize-content-coll)
                                       (update :meta sanitize-content-coll))
         sanitize-conformed-infobox (fn [[type data]]
                                      (case type
@@ -178,33 +193,69 @@
         (update :Results sanitize-topics)
         (update :RelatedTopics sanitize-conformed-related-topics))))
 
-(s/def :duckduckgo/query (s/and string? not-empty))
+(s/def :ask/query (s/and string? not-empty))
+
+(s/def :ask-response/status #{:found :not-found :error})
+
+(s/def :ask-response/value
+  (s/or :found :duckduckgo/response
+        :not-found nil?
+        :error string?))
+
+(s/def :ask/response
+  (s/keys :req-un [:ask-response/status :ask-response/value]))
+
+(s/def :ask/valid-response
+  (s/or :found
+        (s/and :ask/response
+               #(= :found (:status %))
+               #(not (duckduckgo-response-empty? (:value %))))
+        :error
+        (s/and :ask/response
+               #(= :error (:status %))
+               #(nil? (:value %)))
+        :not-found
+        (s/and :ask/response
+               #(= :not-found (:status %))
+               #(duckduckgo-response-empty? (:value %)))))
 
 (s/fdef ask
         :args (s/cat
-               :query :duckduckgo/query
+               :query :ask/query
                :opts (s/* (s/cat :key keyword? :val any?)))
-        :ret (s/nilable :duckduckgo/response))
+        :ret :ask/valid-response)
 
 (def duckduckgo-url "http://api.duckduckgo.com/")
 
+(defn request-duckduckgo-api [params]
+  "Send http-request to duckduckgo api server and parse response body"
+  (let [default-params {:format "json" :no_html 1}]
+    (-> (client/get duckduckgo-url {:query-params (merge params default-params)})
+        (:body)
+        (json/parse-string true)))) ;; keywordize = true
+
 ;; TODO rename to something better: maybe `request-duckduckgo`, `perform-request` etc...
+(defn- safe-ask
+  "Asks for given `query` in duckduckgo ask system
+   and returns json-string response if success"
+  [query & opts]
+  (try
+    (let [params (merge (apply array-map opts) {:q query})
+          response (request-duckduckgo-api params)]
+      (if (duckduckgo-response-empty? response)
+        [:not-found nil]
+        [:found (sanitize-response response)]))
+    (catch Exception e
+      (println (str "Error while fetching data:" (.getMessage e)))
+      [:error (.getMessage e)])))
+
+
 (defn ask
   "Asks for given `query` in duckduckgo ask system
    and returns json-string response if success"
   [query & opts]
-  (let [default-opts {:format "json" :no_html 1}
-        params (merge (apply array-map opts)
-                      default-opts
-                      {:q query})
-        keywordize true]
-    (try
-      (-> (client/get duckduckgo-url {:query-params params})
-          :body
-          (json/parse-string keywordize))
-      (catch Exception e
-        (println (str "Error while fetching data:" (.getMessage e)))
-        nil))))
+  (let [[status value] (safe-ask query)]
+    {:status status :value value}))
 
 ;; (defn search
 ;;   "Search duckduckgo for given query and return sanitized result,
@@ -221,7 +272,10 @@
 
   (stest/instrument `ask {:stub #{`ask}})
 
-  (ask "10" :hello "a" :hey 10)
+  (-> (ask "java" ))
+
+  (s/valid? :duckduckgo/empty-response (ask "10" ))
+
 
   (stest/unstrument `ask)
 
