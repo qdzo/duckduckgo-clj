@@ -136,9 +136,9 @@
     (and (every? empty? topics)
          (every? str/blank? texts))))
 
-(s/def :duckduckgo/empty-response
+(s/def :duckduckgo/not-empty-response
   (s/and :duckduckgo/response
-         duckduckgo-response-empty?))
+         (complement duckduckgo-response-empty?)))
 
 
 (comment
@@ -154,6 +154,17 @@
 )
 
 ;;;;                   EXTRACT LOGIC
+
+
+(def duckduckgo-url "http://api.duckduckgo.com/")
+
+(defn request-duckduckgo-api [params]
+  "Send http-request to duckduckgo api server and parse response body"
+  (let [default-params {:format "json" :no_html 1}]
+    (-> (client/get duckduckgo-url {:query-params (merge params default-params)})
+        (:body)
+        (json/parse-string true)))) ;; keywordize = true
+
 
 (s/fdef sanitize-response
         :args (s/cat :response :duckduckgo/response)
@@ -193,78 +204,44 @@
         (update :Results sanitize-topics)
         (update :RelatedTopics sanitize-conformed-related-topics))))
 
-(s/def :ask/query (s/and string? not-empty))
+(s/def :ask/query
+  (s/with-gen (s/and string? not-empty)
+    #(s/gen #{"clojure" "10" "audi" "BMW" "Scala"})))
 
 (s/def :ask-response/status #{:found :not-found :error})
 
 (s/def :ask-response/value
-  (s/or :found :duckduckgo/response
+  (s/or :found :duckduckgo/not-empty-response
         :not-found nil?
         :error string?))
 
 (s/def :ask/response
-  (s/keys :req-un [:ask-response/status :ask-response/value]))
-
-(s/def :ask/valid-response
-  (s/or :found
-        (s/and :ask/response
-               #(= :found (:status %))
-               #(not (duckduckgo-response-empty? (:value %))))
-        :error
-        (s/and :ask/response
-               #(= :error (:status %))
-               #(nil? (:value %)))
-        :not-found
-        (s/and :ask/response
-               #(= :not-found (:status %))
-               #(duckduckgo-response-empty? (:value %)))))
+  (s/and (s/keys :req-un [:ask-response/status :ask-response/value])
+         #(= (:status %) (first (:value %))))) ;; use `first`, cos conformed :value, like [:branch val]
 
 (s/fdef ask
         :args (s/cat
                :query :ask/query
                :opts (s/* (s/cat :key keyword? :val any?)))
-        :ret :ask/valid-response)
+        :ret :ask/response)
 
-(def duckduckgo-url "http://api.duckduckgo.com/")
-
-(defn request-duckduckgo-api [params]
-  "Send http-request to duckduckgo api server and parse response body"
-  (let [default-params {:format "json" :no_html 1}]
-    (-> (client/get duckduckgo-url {:query-params (merge params default-params)})
-        (:body)
-        (json/parse-string true)))) ;; keywordize = true
 
 ;; TODO rename to something better: maybe `request-duckduckgo`, `perform-request` etc...
-(defn- safe-ask
+(defn ask
   "Asks for given `query` in duckduckgo ask system
    and returns json-string response if success"
   [query & opts]
   (try
     (let [params (merge (apply array-map opts) {:q query})
-          response (request-duckduckgo-api params)]
-      (if (duckduckgo-response-empty? response)
-        [:not-found nil]
-        [:found (sanitize-response response)]))
+          response (request-duckduckgo-api params)
+          [status value] (if (duckduckgo-response-empty? response)
+                           [:not-found nil]
+                           [:found (sanitize-response response)])]
+      {:status status :value value})
     (catch Exception e
       (println (str "Error while fetching data:" (.getMessage e)))
-      [:error (.getMessage e)])))
+      {:status :error :value (.getMessage e)})))
 
-
-(defn ask
-  "Asks for given `query` in duckduckgo ask system
-   and returns json-string response if success"
-  [query & opts]
-  (let [[status value] (safe-ask query)]
-    {:status status :value value}))
-
-;; (defn search
-;;   "Search duckduckgo for given query and return sanitized result,
-;;    cleared from unnecessery information"
-;;   [query]
-;;   (if-let [response (ask query)]
-;;     (sanitize-response response)))
-
-;; (spit "clojure-query.txt" (search "scala"))
 
 (comment
 
@@ -272,10 +249,9 @@
 
   (stest/instrument `ask {:stub #{`ask}})
 
-  (-> (ask "java" ))
+  (-> (ask "clojure") :value duckduckgo-response-empty? )
 
-  (s/valid? :duckduckgo/empty-response (ask "10" ))
-
+  (s/explain :ask/valid-response (ask "clojure" ))
 
   (stest/unstrument `ask)
 
