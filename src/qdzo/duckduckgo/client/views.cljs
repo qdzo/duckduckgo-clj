@@ -1,5 +1,5 @@
 (ns qdzo.duckduckgo.client.views
-  (:require [clojure.string :refer [blank?]]
+  (:require [clojure.string :as str :refer [blank?]]
             [reagent.core :as r]))
 
 (def ENTER 13)
@@ -7,6 +7,10 @@
 (def non-blank?
   "predicate for non-blank string"
   (complement blank?))
+
+(defn warning-panel [msg]
+  [:div.panel.warning-panel
+   [:strong msg]])
 
 ;; Infobox.content[{label, data_type(string, instance), value}]
 ;; Infobox.meta [{label, data_type(string, instance), value}]
@@ -51,9 +55,10 @@
                        :topics (:Topics item)}]
               [:a {:href (:FirstURL item)
                    :target "_blank"}
-               (:Text item)])
-        ])]]])
+               (:Text item)])])]]])
 
+#_(-> (apply str (take 90 (:Text item)))
+    (str "..."))
 
 ;; Entity (string) (what kind of searched entity)
 ;; Abstract

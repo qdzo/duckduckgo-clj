@@ -72,18 +72,21 @@
           (f payload)))))
 
 (defn app [state dispatch]
-  (let [response-cursor (reagent/cursor state [:response])
+  (let [{:keys [status value]} (:response @state)
         input-cursor (reagent/cursor state [:input])]
     (log "APP RENDER")
     [:div#app
      [:style style]
      [v/input-panel
       {:input input-cursor
-       :minimized @response-cursor ;; FIXME: set more accurate data here.
+       :minimized (not (nil? status))
        :on-change #(dispatch :set-input %)
        :on-submit #(dispatch :ask %)}]
-     (when @response-cursor        ;; TODO: add view for empty results
-       [v/result-panel @response-cursor])]))
+     (case status
+       "found" [v/result-panel value]
+       "not-found" [v/warning-panel "Duckduckgo doesn't know answer for your question :("]
+       "error" [v/warning-panel (str "Error while try fetch data: " value)]
+       nil)]))
 
 (defonce state (atom {:input "" :response nil}))
 
@@ -121,7 +124,7 @@
   (-> @state (dissoc :response))
   (-> @state  :response :RelatedTopics )
 
-  (-> @state   keys)
+  (-> @state  )
 
   (swap! state assoc :sort #{}))
 

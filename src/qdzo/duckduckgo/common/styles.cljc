@@ -75,6 +75,51 @@
      :margin-top (u/px 0)
      :padding (u/px 7) }]])
 
+(def warning-panel
+  [:.warning-panel
+   {:height "100%"
+    :text-align "center"
+    :display "flex"
+    :justify-content "center"
+    :padding-right (u/vh 35)
+    :padding-left (u/vh 35)
+    :align-items "center"}
+
+   (at-media
+    {:max-width (u/px 1480)}
+    [:&.warning-panel
+     {:padding-right (u/vh 30)
+      :padding-left (u/vh 30)}])
+
+   (at-media
+    {:max-width (u/px 1350)}
+    [:&.warning-panel
+     {:padding-right (u/vh 20)
+      :padding-left (u/vh 20)}])
+
+   (at-media
+    {:max-width (u/px 1150)}
+    [:&.warning-panel
+     {:padding-right (u/vh 15)
+      :padding-left (u/vh 15)}])
+
+   (at-media
+    {:max-width (u/px 1050)}
+    [:&.warning-panel
+     {:padding-right (u/vh 10)
+      :padding-left (u/vh 10)}])
+
+   (at-media
+    {:max-width (u/px 980)}
+    [:&.warning-panel
+     {:padding-right 0
+      :padding-left 0}])
+
+   [:strong
+    {:font-size (u/px (+ default-header-font-size 10))
+     :font-weight 100}]
+   ])
+
 (def input-panel-style
   [:#panel
    {:text-align "center"
@@ -236,5 +281,6 @@
 
 (def style
   (css body-style
+       warning-panel
        input-panel-style
        result-panel-style))
