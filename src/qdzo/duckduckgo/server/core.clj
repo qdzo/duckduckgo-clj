@@ -25,15 +25,15 @@
 ;;   [from to & z :as r]
 ;;   (str "Pong " from " to " to ". Unbound params: " z ". Req-map: " r))
 (defroutes app-routes
-           (GET "/" [] (index))
-           ;; stab for web-client. for loading with direct link: "[host]/search?q=[question]"
-           (GET "/query" [] (index))
-           (GET "/index" [] (index))
-           (GET "/search" [q] (if q
-                                (json/generate-string (ask q))
-                                (warning-msg "Query can't be an empty string.")))
-           (route/resources "/assets/")
-           (route/not-found "<p>Page not found</p>"))
+  (GET "/" [] (index))
+  ;; stab for web-client. for loading with direct link: "[host]/search?q=[question]"
+  (GET "/query" [] (index))
+  (GET "/index" [] (index))
+  (GET "/search" [q] (if q
+                       (json/generate-string (ask q))
+                       (warning-msg "Query can't be an empty string.")))
+  (route/resources "/assets/")
+  (route/not-found "<p>Page not found</p>"))
 
 (def app
   "main app handler"
@@ -63,6 +63,7 @@
   (stop-server!)
 
   )
+
 
 
 ;; calls on namespace loading (tested in repl)
