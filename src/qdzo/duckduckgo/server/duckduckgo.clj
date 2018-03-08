@@ -180,12 +180,15 @@
                     :AbstractSource :Answer
                     :Results :Infobox
                     :RelatedTopics]
+        content-with-instanceof-label? #(= (:label %) "Instance of") ;; <- this 'content' has strange values
+        remove-content-with-instanceof-label (partial filter (complement content-with-instanceof-label?))
         ;; not interesting what data-type is there, just take value
         sanitize-conformed-content-value #(update % :value second)
         sanitize-content-coll (partial mapv #(-> % (select-keys [:label :value])
-                                                 sanitize-conformed-content-value))
+                                           sanitize-conformed-content-value))
         sanitize-complex-infobox #(-> %
-                                      (update :content sanitize-content-coll)
+                                      (update :content (comp sanitize-content-coll
+                                                          remove-content-with-instanceof-label))
                                       (update :meta sanitize-content-coll))
         sanitize-conformed-infobox (fn [[type data]]
                                      (case type
@@ -249,7 +252,7 @@
 
   (stest/instrument `ask {:stub #{`ask}})
 
-  (-> (ask "clojure") :value duckduckgo-response-empty? )
+  (-> (ask "clojure") :value  :Infobox :content)
 
   (s/explain :ask/valid-response (ask "clojure" ))
 
