@@ -1,19 +1,25 @@
 (ns qdzo.duckduckgo.common.styles
   (:require [garden.core :refer [css]]
             [garden.units :as u]
+            [garden.color :as c]
             [garden.stylesheet :refer [at-media]]))
 
 (def default-font-size 21)
 (def default-header-font-size 22)
 (def default-background-color "#352727")
-(def default-color "white")
+(def default-color "#ffffff")
 (def default-header-color "#af8088")
 (def default-border-color "#6868f1")
 (def default-btn-color "#8282d4")
 (def default-btn-hover-color "#8292e2")
 (def default-btn-active-color "#8292e2") ;; TODO change color
-(def default-visited-link-color "#6772abe6")
+(def default-visited-link-color "#6772ab")
 (def default-border-radius (u/px 3))
+
+(defn hex->rgba [hex a]
+  (when-let [{:keys [red green blue]} (c/hex->rgb hex)]
+    (c/rgba red green blue a)))
+
 
 (def body-style
   [:body
@@ -37,11 +43,21 @@
      :flex-direction :column
      :justify-content :center}]
 
-   [:a {:color default-color}
+   [:a { :color default-color
+        ;; :outline "1px dotted blue"
+        ;; :color (hex->rgba default-color 1.0) 
+        }
 
-    [:&:visited {:color default-visited-link-color}]
+    [:&:visited {
+                 :text-decoration "none"
+                 :color default-btn-hover-color
+                 ;; :color "rgba(255, 255, 255, 0.5)"
+                 ;; :color (c/rgba 255 255 255 0.3)
+                 ;; :color (hex->rgba default-color 0.6) ;; transparensy doesn't work in :visited selector
+                 }]
 
-    [:&:hover {:color default-btn-hover-color}]]
+    [:&:hover {:text-decoration-color default-btn-hover-color}]
+    ]
 
    [:ul {:padding-left (u/px 22)
          :margin-bottom 0
@@ -54,16 +70,17 @@
      :padding-bottom (u/px 1)
      :color "white"
      :background-color default-btn-color
-     :border (str "1px  solid " default-border-color)
+     :border (str 0 default-border-color)
      :border-radius default-border-radius
      :transition "200ms"}
 
     [:&:focus {:outline (u/px 2)}]
 
     [:&:hover {:cursor :pointer
-               :background-color default-btn-hover-color}]
+               :background-color default-btn-hover-color
+               }]
 
-    [:&:active {:background-color "RED"}]]
+    [:&:active {:background-color default-btn-active-color}]]
 
    [:.panel
     {
@@ -151,12 +168,14 @@
      :border-right  0
      :outline       0
      :color         "white"
-     :border-bottom (str "1px solid " default-btn-color)
-     :transition    "300ms"
+     :border-bottom (str "0.5px solid " default-btn-color)
+     :transition    "100ms"
      :text-align    "center"}
 
     [:&:focus :&:hover
-     {:border-bottom (str "2px solid " default-btn-hover-color)
+     {:border-bottom (str "1.5px solid " default-btn-hover-color)
+      ;; :caret-color default-btn-hover-color
+
       :height (u/px 33)}]]
 
    [:#btn
@@ -211,10 +230,10 @@
       :font-style  "italic"}]
 
     [:.logo
-     {:height (u/px 64)
+     {:height (u/px 96)
       :margin (u/px 5)}
 
-     [:img {:height (u/px 64)}]]]
+     [:img {:height (u/px 96)}]]]
 
    [:.content
     {:padding-top (u/px 5)
