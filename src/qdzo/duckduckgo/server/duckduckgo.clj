@@ -258,16 +258,6 @@
 
   (stest/unstrument `ask)
 
-  (def cloj-definition (ask "ceylon"))
-
-  cloj-definition
-
-  (-> cloj-definition
-      sanitize-response
-      (clojure.pprint/pprint
-       (clojure.java.io/writer "cloj-definition.txt")))
-
-
 
   )
 

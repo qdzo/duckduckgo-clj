@@ -12,13 +12,9 @@
 (def default-border-color "#6868f1")
 (def default-btn-color "#8282d4")
 (def default-btn-hover-color "#8292e2")
-(def default-btn-active-color "#8292e2") ;; TODO change color
+(def default-btn-active-color "#585dab") ;; TODO change color
 (def default-visited-link-color "#6772ab")
-(def default-border-radius (u/px 3))
 
-(defn hex->rgba [hex a]
-  (when-let [{:keys [red green blue]} (c/hex->rgb hex)]
-    (c/rgba red green blue a)))
 
 
 (def body-style
@@ -71,7 +67,6 @@
      :color "white"
      :background-color default-btn-color
      :border (str 0 default-border-color)
-     :border-radius default-border-radius
      :transition "200ms"}
 
     [:&:focus {:outline (u/px 2)}]
@@ -85,7 +80,6 @@
    [:.panel
     {
      :background-color default-background-color
-     ;; :border-radius default-background-color
      ;; :box-shadow (str "0 1px 2px 0 " default-background-color)
      :color default-color
      :margin (u/px 10)
@@ -141,7 +135,6 @@
   [:#panel
    {:text-align "center"
     :display :flex
-    ;; :margin-bottom (u/px 20)
     :flex-grow 1
     :flex-direction :column
     :justify-content :center
@@ -157,11 +150,11 @@
    ["input::-webkit-input-placeholder" {:color "white"}]
 
    [:input
-    {:margin-right  (u/px 10)
-     :margin-top (u/px -1)
-     :height        (u/px 34)
+    {:padding      (u/px 10)
+     :height        (u/px 35)
+     :margin-right (u/px 10)
      :width         (u/px 270)
-     :font-size     default-font-size
+     :font-size     (- default-font-size 4)
      :background    :transparent
      :border-top    0
      :border-left   0
@@ -169,17 +162,14 @@
      :outline       0
      :color         "white"
      :border-bottom (str "0.5px solid " default-btn-color)
-     :transition    "100ms"
+     :transition    "200ms"
      :text-align    "center"}
 
     [:&:focus :&:hover
-     {:border-bottom (str "1.5px solid " default-btn-hover-color)
-      ;; :caret-color default-btn-hover-color
-
-      :height (u/px 33)}]]
+     {:border-bottom (str "1.5px solid " default-btn-hover-color)}]]
 
    [:#btn
-    {:height     (u/px 35)
+    {:height     (u/px 36)
      :font-size  (- default-font-size 4)
      :transition "300ms"}
 
