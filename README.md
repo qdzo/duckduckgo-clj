@@ -1,7 +1,23 @@
 # Duckduckgo-clj
 
-Search-like application, which consumes ["duckduckgo instant answer api"](https://duckduckgo.com/api).
+Search-like application, consumes ["duckduckgo instant answer api"](https://duckduckgo.com/api).
+
 This is a toy-project, which purpose is to test `clojure/clojurescript` alliance as full-stack platform for client-server applications.
+
+### Client's part made with:
+
+- `reagent`
+- `core.async`
+- `garden`
+- `cljs-http`
+
+### Server's part made with:
+
+- `ring`
+- `compojure`
+- `http-clj`
+
+> Powered by `clojure.spec`
 
 ## Screenshots
 
@@ -16,10 +32,15 @@ This is a toy-project, which purpose is to test `clojure/clojurescript` alliance
 
 ## Usage
 
-### Build project
+### Clone project
 
 ```bash
 git clone https://github.com/qdzo/duckduckgo-clj && cd duckduckgo-clj
+```
+
+### Build project
+
+```bash
 lein do cljsbuild once, ring uberjar
 ```
 
